@@ -3,6 +3,7 @@ module bookq.xyz/mercariWatchdog
 go 1.17
 
 require (
+	github.com/bep/debounce v1.2.0
 	github.com/bookqaq/goForMercari v0.0.0
 	go.mongodb.org/mongo-driver v1.8.3
 )
