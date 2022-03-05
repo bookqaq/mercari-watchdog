@@ -42,18 +42,23 @@ func GetAllTasks(interval int) ([]AnalysisTask, error) {
 	return result, nil
 }
 
-func GetDataDB(kw string) (AnalysisData, error) {
+func GetDataDB(taskid int32) (AnalysisData, error) {
 	coll := db.Collection("AnalysisData")
-	cursor, err := coll.Find(context.TODO(), bson.D{primitive.E{Key: "keyword", Value: kw}})
-	if err != nil {
-		return AnalysisData{}, err
-	}
 	var result AnalysisData
-	err = cursor.All(context.TODO(), &result)
+	err := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskid}}).Decode(&result)
 	if err != nil {
 		return AnalysisData{}, err
 	}
 	return result, nil
+}
+
+func UpdateDataDB(data AnalysisData) error {
+	coll := db.Collection("AnalysisData")
+	res := coll.FindOneAndReplace(context.TODO(), bson.D{primitive.E{Key: "_id", Value: data.ID}}, data)
+	if err := res.Err(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // keyword filter

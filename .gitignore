@@ -17,3 +17,4 @@
 *_test.go
 
 database/connector.go
+*.txt

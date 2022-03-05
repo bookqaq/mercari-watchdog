@@ -10,7 +10,9 @@ import (
 )
 
 func Boot() {
-	debug_ticker_1s := time.NewTicker(1 * time.Second)
+	utils.Init()
+
+	debug_ticker_1s := time.NewTicker(10 * time.Second)
 	ticker_10m := time.NewTicker(600 * time.Second)
 
 	tickCounter := 0
@@ -30,7 +32,8 @@ func Boot() {
 				maxCounter = false
 			}
 		case t := <-debug_ticker_1s.C:
-			runWorkflow(1, t)
+			fmt.Println("debug: 10s workflow run.")
+			runWorkflow(10, t)
 		}
 	}
 }
@@ -48,19 +51,36 @@ func runWorkflow(interval int, t time.Time) {
 }
 
 func runTask(i int, t time.Time, task utils.AnalysisTask) {
+	fmt.Printf("debug: task %v run\n", task.TaskID)
 	data, err := mercarigo.Mercari_search(task.Keywords[0], task.Sort, task.Order, "", 30, task.MaxPage)
 	if err != nil {
-		fmt.Printf("failed to search, taskID %v, time %v", task.TaskID, t.Unix())
+		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
 	}
+
+	fmt.Printf("debug: result found\n")
 
 	data = utils.KeywordFilter(task, data)
 
-	result, err := compare.Run(data, task)
+	fmt.Printf("debug: filtered data %v\n", data)
+
+	recentItems, err := utils.GetDataDB(task.TaskID)
 	if err != nil {
-		fmt.Printf("failed to compare, taskID %v, time %v, error:\n%s", task.TaskID, t.Unix(), err)
+		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
+		return
+	}
+	result, err := compare.Run(data, recentItems, task)
+	if err != nil {
+		fmt.Printf("failed to compare, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
 
-	fmt.Println(result)
+	recentItems.Data = result
+	recentItems.Time = time.Now().Unix()
+
+	err = utils.UpdateDataDB(recentItems)
+	if err != nil {
+		fmt.Printf("failed to update AnalysisData, taskID %v, time %v, %s", recentItems.TaskID, t.Unix(), err)
+		return
+	}
 }

@@ -8,15 +8,10 @@ import (
 )
 
 // implement compare, updated methods would be available in future
-func Run(items []mercarigo.MercariItem, task utils.AnalysisTask) ([]mercarigo.MercariItem, error) {
-	recentItems, err := utils.GetDataDB(task.Keywords[0])
-	if err != nil {
-		return nil, err
-	}
+func Run(data []mercarigo.MercariItem, recentData utils.AnalysisData, task utils.AnalysisTask) ([]mercarigo.MercariItem, error) {
+	i, itemlen, uptime := 0, len(data), recentData.Time
 
-	i, itemlen, uptime := 0, len(items), recentItems.Data[0].Updated
-
-	for _, item := range items {
+	for _, item := range data {
 		if item.Updated < uptime {
 			break
 		}
@@ -27,11 +22,11 @@ func Run(items []mercarigo.MercariItem, task utils.AnalysisTask) ([]mercarigo.Me
 		return nil, fmt.Errorf("items compare fail, no item update")
 	}
 
-	items = items[:i]
+	data = data[:i]
 
 	if task.TargetPrice[0] >= 0 && task.TargetPrice[1] >= task.TargetPrice[0] {
 		result := make([]mercarigo.MercariItem, 0)
-		for _, item := range items {
+		for _, item := range data {
 			if item.Price >= task.TargetPrice[0] && item.Price <= task.TargetPrice[1] {
 				result = append(result, item)
 			}
@@ -39,8 +34,8 @@ func Run(items []mercarigo.MercariItem, task utils.AnalysisTask) ([]mercarigo.Me
 		if len(result) == 0 {
 			result = append(result, mercarigo.MercariItem{})
 		}
-		items = result
+		data = result
 	}
 
-	return items, nil
+	return data, nil
 }
