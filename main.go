@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"bookq.xyz/mercariWatchdog/bot"
 	"bookq.xyz/mercariWatchdog/tasks"
 	"bookq.xyz/mercariWatchdog/utils"
 	"github.com/bookqaq/goForMercari/mercarigo"
@@ -14,6 +15,7 @@ import (
 
 func main() {
 	//debug_addAnalysisData()
+	go bot.Boot()
 	tasks.Boot()
 }
 

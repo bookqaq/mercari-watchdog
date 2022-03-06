@@ -12,7 +12,7 @@ import (
 func Boot() {
 	utils.Init()
 
-	debug_ticker_1s := time.NewTicker(10 * time.Second)
+	debug_ticker := time.NewTicker(18400 * time.Second)
 	ticker_10m := time.NewTicker(600 * time.Second)
 
 	tickCounter := 0
@@ -31,9 +31,9 @@ func Boot() {
 				tickCounter = 0
 				maxCounter = false
 			}
-		case t := <-debug_ticker_1s.C:
-			fmt.Println("debug: 10s workflow run.")
-			runWorkflow(10, t)
+		case t := <-debug_ticker.C:
+			fmt.Printf("占位计时器. %v\n", t.Unix())
+			//runWorkflow(10, t)
 		}
 	}
 }
@@ -77,6 +77,7 @@ func runTask(i int, t time.Time, task utils.AnalysisTask) {
 
 	recentItems.Data = result
 	recentItems.Time = time.Now().Unix()
+	recentItems.Length = len(result)
 
 	err = utils.UpdateDataDB(recentItems)
 	if err != nil {

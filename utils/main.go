@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -42,6 +43,20 @@ func GetAllTasks(interval int) ([]AnalysisTask, error) {
 	return result, nil
 }
 
+func GetTasksByQQ(qq int64) ([]AnalysisTask, error) {
+	var result []AnalysisTask
+	coll := db.Collection("AnalysisTask")
+	cursor, err := coll.Find(context.TODO(), bson.D{primitive.E{Key: "owner", Value: qq}})
+	if err != nil {
+		return nil, err
+	}
+	err = cursor.All(context.TODO(), &result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func GetDataDB(taskid int32) (AnalysisData, error) {
 	coll := db.Collection("AnalysisData")
 	var result AnalysisData
@@ -61,7 +76,31 @@ func UpdateDataDB(data AnalysisData) error {
 	return nil
 }
 
-// keyword filter
+func InsertDataDB(task AnalysisTask) error {
+	result, err := mercarigo.Mercari_search(task.Keywords[0], task.Sort, task.Order, "", 30, 3)
+	if err != nil {
+		return err
+	}
+	result = KeywordFilter(task, result)
+	result = PriceFilter(task, result)
+
+	adata := AnalysisData{}
+	adata.ID = primitive.NewObjectID()
+	adata.TaskID = task.TaskID
+	adata.Data = append(adata.Data, result...)
+	adata.Length = len(result)
+	adata.Time = time.Now().Unix()
+	adata.Keywords = append(adata.Keywords, task.Keywords...)
+
+	coll := db.Collection("AnalysisData")
+	_, err = coll.InsertOne(context.TODO(), adata)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// filters
 
 func KeywordFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.MercariItem {
 	keywords := task.Keywords[1:]
@@ -73,6 +112,22 @@ func KeywordFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.
 			}
 			data = tmp
 		}
+	}
+	return data
+}
+
+func PriceFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.MercariItem {
+	if task.TargetPrice[0] >= 0 && task.TargetPrice[1] >= task.TargetPrice[0] {
+		result := make([]mercarigo.MercariItem, 0)
+		for _, item := range data {
+			if item.Price >= task.TargetPrice[0] && item.Price <= task.TargetPrice[1] {
+				result = append(result, item)
+			}
+		}
+		if len(result) == 0 {
+			result = append(result, mercarigo.MercariItem{})
+		}
+		data = result
 	}
 	return data
 }
@@ -90,14 +145,16 @@ func addTaskBuffer() {
 
 func addTasks() {
 	lock.Lock()
-
+	defer lock.Unlock()
 	data := make([]interface{}, len(tasksToAdd))
 	for i, task := range tasksToAdd {
+		task.ID = primitive.NewObjectID()
 		data[i] = task
 	}
 	tasksToAdd = make([]AnalysisTask, 0)
 	coll := db.Collection("AnalysisTask")
-	coll.InsertMany(context.TODO(), data)
-
-	lock.Unlock()
+	_, err := coll.InsertMany(context.TODO(), data)
+	if err != nil {
+		fmt.Printf("err inserting tasks from buffer, %s\n", err)
+	}
 }
