@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"bookq.xyz/mercariWatchdog/bot"
 	"bookq.xyz/mercariWatchdog/compare"
 	"bookq.xyz/mercariWatchdog/utils"
 	"github.com/bookqaq/goForMercari/mercarigo"
@@ -78,6 +79,8 @@ func runTask(i int, t time.Time, task utils.AnalysisTask) {
 	recentItems.Data = result
 	recentItems.Time = time.Now().Unix()
 	recentItems.Length = len(result)
+
+	go bot.MercariPushMsg(recentItems, task.Owner, task.Group)
 
 	err = utils.UpdateDataDB(recentItems)
 	if err != nil {

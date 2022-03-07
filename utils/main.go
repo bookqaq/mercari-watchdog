@@ -57,6 +57,18 @@ func GetTasksByQQ(qq int64) ([]AnalysisTask, error) {
 	return result, nil
 }
 
+func DeleteTask(taskID int32) error {
+	coll := db.Collection("AnalysisTask")
+	res, err := coll.DeleteOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return fmt.Errorf("未找到可删除的任务")
+	}
+	return nil
+}
+
 func GetDataDB(taskid int32) (AnalysisData, error) {
 	coll := db.Collection("AnalysisData")
 	var result AnalysisData
@@ -98,6 +110,27 @@ func InsertDataDB(task AnalysisTask) error {
 		return err
 	}
 	return nil
+}
+
+func DeleteDataDB(taskID int32) error {
+	coll := db.Collection("AnalysisData")
+	res, err := coll.DeleteOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return fmt.Errorf("未找到可删除的历史数据")
+	}
+	return nil
+}
+
+func FindWhitelist(group int64) (bool, error) {
+	coll := db.Collection("GroupWhitelist")
+	res := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "group", Value: group}})
+	if res.Err() != nil {
+		return false, res.Err()
+	}
+	return true, nil
 }
 
 // filters

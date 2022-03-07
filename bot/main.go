@@ -5,7 +5,8 @@ import (
 )
 
 func Boot() {
-	Pichubot.Listeners.OnPrivateMsg = append(Pichubot.Listeners.OnPrivateMsg, handlerPrivateMsg)
+	Pichubot.Listeners.OnGroupMsg = append(Pichubot.Listeners.OnGroupMsg, handlerGroupMsg)
+	Pichubot.Listeners.OnGroupRequest = append(Pichubot.Listeners.OnGroupRequest, handlerGroupRequest)
 	bot := Pichubot.NewBot()
 	bot.Config = Pichubot.Config{
 		Loglvl:   Pichubot.LOGGER_LEVEL_INFO,
