@@ -14,14 +14,14 @@ var TIME_1H_STRING = []string{"1时", "1小时", "60分", "3600秒"}
 func handlerGroupMsg(e Pichubot.MessageGroup) {
 	msgarr := strings.Split(e.Message, "\n")
 	switch {
-	case msgarr[0] == "/蹲煤":
+	case msgarr[0] == "蹲煤":
 		msg, err := createTask(msgarr[1:], e.Sender.UserID, e.GroupID)
 		if err != nil {
 			Pichubot.SendGroupMsg(fmt.Sprintf("添加任务失败了，这是调试用的error:%v", err), e.GroupID)
 			return
 		}
 		Pichubot.SendGroupMsg(msg, e.GroupID)
-	case msgarr[0] == "/查询":
+	case msgarr[0] == "查询":
 		res, err := utils.GetTasksByQQ(e.Sender.UserID)
 		if err != nil {
 			Pichubot.SendGroupMsg(fmt.Sprintf("查询失败了，这是调试用的error:%v", err), e.GroupID)
@@ -33,7 +33,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			msg += item.FormatSimplifiedChinese()
 		}
 		Pichubot.SendGroupMsg(msg, e.GroupID)
-	case strings.Index(msgarr[0], "/删除") == 0:
+	case strings.Index(msgarr[0], "删除") == 0:
 		msgarr = strings.Split(msgarr[0], " ")
 		msgarr = msgarr[1:]
 		idarr := make([]int32, len(msgarr))

@@ -14,10 +14,10 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	var result string
 	switch {
 	case len(params) == 0:
-		result = "格式(使用中文逗号分隔一行中的内容):\n" + "/蹲煤\n" +
+		result = "格式(使用中文逗号分隔一行中的内容):\n" + "蹲煤\n" +
 			"关键词:\n" + "目标价格:\n" + "搜索间隔:\n" + "搜索页数:\n" +
 			"注:关键词上限为5个,有多个关键词时会进行逐级筛选，目标价格中最低价为负数时视为任意价格，搜索间隔目前只有10分钟和1小时，每搜索页中有30个结果\n" +
-			"以下是举例:\n" + "/蹲煤\n" + "关键词:sasakure, lasah\n" + "搜索间隔:1小时" + "目标价格:100，500\n" + "搜索页数:3"
+			"以下是举例:\n" + "蹲煤\n" + "关键词:sasakure, lasah\n" + "搜索间隔:1小时" + "目标价格:100，500\n" + "搜索页数:3"
 
 	case len(params) == 4:
 		task, err := translateParams(params)
