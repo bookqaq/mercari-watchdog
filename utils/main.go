@@ -150,19 +150,15 @@ func KeywordFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.
 }
 
 func PriceFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.MercariItem {
+	result := make([]mercarigo.MercariItem, 0)
 	if task.TargetPrice[0] >= 0 && task.TargetPrice[1] >= task.TargetPrice[0] {
-		result := make([]mercarigo.MercariItem, 0)
 		for _, item := range data {
 			if item.Price >= task.TargetPrice[0] && item.Price <= task.TargetPrice[1] {
 				result = append(result, item)
 			}
 		}
-		if len(result) == 0 {
-			result = append(result, mercarigo.MercariItem{})
-		}
-		data = result
 	}
-	return data
+	return result
 }
 
 // Cache and insert tasks.

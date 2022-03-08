@@ -65,6 +65,9 @@ func handlerGroupRequest(r Pichubot.GroupRequest) {
 }
 
 func MercariPushMsg(data utils.AnalysisData, owner int64, group int64) {
+	if data.Length <= 0 {
+		return
+	}
 	msgarr := data.FormatSimplifiedChinese()
 	msgarr[0] = fmt.Sprintf("[CQ:at,qq=%v]\n", owner) + msgarr[0]
 	for i, item := range msgarr {

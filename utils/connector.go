@@ -12,7 +12,7 @@ import (
 
 func Connect() *mongo.Database {
 
-	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false")
+	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017/?readPreference=primary&ssl=false")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	defer cancel()

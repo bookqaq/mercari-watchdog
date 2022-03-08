@@ -51,10 +51,13 @@ func (t *AnalysisTask) FormatSimplifiedChinese() string {
 func (d *AnalysisData) FormatSimplifiedChinese() []string {
 	res := make([]string, 1)
 	res[0] = fmt.Sprintf("任务ID:%v\n关键词:%s\n时间:%v\n蹲到符合要求的结果数为%v", d.TaskID, concatKeyword(d.Keywords), d.Time, d.Length)
-	for _, item := range d.Data {
-		tmp := fmt.Sprintf("[CQ:image,file=%s]名称:%s\n价格:%vyen\n状态:%s\n更新时间:%v\n链接:%s",
-			item.ImageURL[0], item.ProductName, item.Price, item.Status, item.Updated, item.GetProductURL())
-		res = append(res, tmp)
+
+	if d.Length > 0 {
+		for _, item := range d.Data {
+			tmp := fmt.Sprintf("[CQ:image,file=%s]名称:%s\n价格:%vyen\n状态:%s\n更新时间:%v\n链接:%s",
+				item.ImageURL[0], item.ProductName, item.Price, item.Status, item.Updated, item.GetProductURL())
+			res = append(res, tmp)
+		}
 	}
 	return res
 }
