@@ -17,7 +17,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 		result = "格式(使用中文逗号分隔一行中的内容):\n" + "蹲煤\n" +
 			"关键词:\n" + "目标价格:\n" + "搜索间隔:\n" + "搜索页数:\n" +
 			"注:关键词上限为5个,有多个关键词时会进行逐级筛选，目标价格中最低价为负数时视为任意价格，搜索间隔目前只有10分钟和1小时，每搜索页中有30个结果\n" +
-			"以下是举例:\n" + "蹲煤\n" + "关键词:sasakure, lasah\n" + "搜索间隔:1小时" + "目标价格:100，500\n" + "搜索页数:3"
+			"以下是举例:\n" + "蹲煤\n" + "关键词:sasakure, lasah\n" + "搜索间隔:1小时\n" + "目标价格:100，500\n" + "搜索页数:3"
 
 	case len(params) == 4:
 		task, err := translateParams(params)
@@ -76,16 +76,20 @@ func translateParams(params []string) (utils.AnalysisTask, error) {
 		return utils.AnalysisTask{}, fmt.Errorf("解析目标价格失败")
 	}
 	satmp := strings.Split(tmp, "，")
-	itmp, err := strconv.Atoi(satmp[0])
-	if err != nil {
-		return utils.AnalysisTask{}, fmt.Errorf("解析目标价格失败")
+	if len(satmp) != 2 {
+		task.TargetPrice[0], task.TargetPrice[1] = -1, 0
+	} else {
+		itmp, err := strconv.Atoi(satmp[0])
+		if err != nil {
+			return utils.AnalysisTask{}, fmt.Errorf("解析目标价格失败")
+		}
+		task.TargetPrice[0] = itmp
+		itmp, err = strconv.Atoi(satmp[1])
+		if err != nil {
+			return utils.AnalysisTask{}, fmt.Errorf("解析目标价格失败")
+		}
+		task.TargetPrice[1] = itmp
 	}
-	task.TargetPrice[0] = itmp
-	itmp, err = strconv.Atoi(satmp[1])
-	if err != nil {
-		return utils.AnalysisTask{}, fmt.Errorf("解析目标价格失败")
-	}
-	task.TargetPrice[1] = itmp
 
 	tmp, ok = pmap["搜索间隔"]
 	if !ok {
@@ -102,7 +106,7 @@ func translateParams(params []string) (utils.AnalysisTask, error) {
 	if !ok {
 		return utils.AnalysisTask{}, fmt.Errorf("解析搜索页数失败")
 	}
-	itmp, err = strconv.Atoi(tmp)
+	itmp, err := strconv.Atoi(tmp)
 	if err != nil {
 		return utils.AnalysisTask{}, fmt.Errorf("解析搜索页数失败")
 	}
