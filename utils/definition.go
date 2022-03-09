@@ -34,6 +34,11 @@ type GroupWhitelist struct {
 	Group int64              `bson:"group"`
 }
 
+type PushMsg struct {
+	Dst int64
+	S   string
+}
+
 func concatKeyword(keywords []string) string {
 	kwstring := keywords[0]
 	for _, item := range keywords[1:] {

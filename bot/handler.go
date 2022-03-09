@@ -10,6 +10,7 @@ import (
 )
 
 var TIME_1H_STRING = []string{"1时", "1小时", "60分", "3600秒"}
+var PushMsgChan chan utils.PushMsg
 
 func handlerGroupMsg(e Pichubot.MessageGroup) {
 	msgarr := strings.Split(e.Message, "\n")
@@ -17,14 +18,14 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 	case msgarr[0] == "蹲煤":
 		msg, err := createTask(msgarr[1:], e.Sender.UserID, e.GroupID)
 		if err != nil {
-			Pichubot.SendGroupMsg(fmt.Sprintf("添加任务失败了，这是调试用的error:%v", err), e.GroupID)
+			PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}
 			return
 		}
-		Pichubot.SendGroupMsg(msg, e.GroupID)
+		PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: msg}
 	case msgarr[0] == "查询":
 		res, err := utils.GetTasksByQQ(e.Sender.UserID)
 		if err != nil {
-			Pichubot.SendGroupMsg(fmt.Sprintf("查询失败了，这是调试用的error:%v", err), e.GroupID)
+			PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}
 			return
 		}
 		msg := "任务:"
@@ -32,7 +33,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			msg += "\n"
 			msg += item.FormatSimplifiedChinese()
 		}
-		Pichubot.SendGroupMsg(msg, e.GroupID)
+		PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: msg}
 	case strings.Index(msgarr[0], "删除") == 0:
 		msgarr = strings.Split(msgarr[0], " ")
 		msgarr = msgarr[1:]
@@ -40,19 +41,17 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 		for i, item := range msgarr {
 			tmp, err := strconv.Atoi(item)
 			if err != nil {
-				Pichubot.SendGroupMsg("任务编号转换失败了，请先确认输入是否是纯数字", e.GroupID)
+				PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: "任务编号转换失败了，请先确认输入是否是纯数字"}
 				return
 			}
 			idarr[i] = int32(tmp)
 		}
 		err := deleteTask(idarr)
 		if err != nil {
-			Pichubot.SendGroupMsg(fmt.Sprintf("删除失败了，这是调试用的error:%v", err), e.GroupID)
+			PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}
 			return
 		}
-		Pichubot.SendGroupMsg("理论上是全部删除成功了(没给id的情况下当然也算成功)", e.GroupID)
-	default:
-		Pichubot.SendGroupMsg("程序有任何问题，请加好友问我295589844，未来会开留言功能向号主转发", e.GroupID)
+		PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: "理论上是全部删除成功了(没给id的情况下当然也算成功)"}
 	}
 }
 
@@ -71,10 +70,16 @@ func MercariPushMsg(data utils.AnalysisData, owner int64, group int64) {
 	msgarr := data.FormatSimplifiedChinese()
 	msgarr[0] = fmt.Sprintf("[CQ:at,qq=%v]\n", owner) + msgarr[0]
 	for i, item := range msgarr {
-		Pichubot.SendGroupMsg(item, group)
-		if i > 5 {
-			Pichubot.SendGroupMsg("新数据太多了，我没有使用经验怕封号，其他的新数据还请自己到mercari看，未来肯定会实现更好的筛选算法", group)
+		PushMsgChan <- utils.PushMsg{Dst: group, S: item}
+		if i > 10 {
 			break
 		}
+	}
+}
+
+func msgPushService() {
+	for {
+		push := <-PushMsgChan
+		Pichubot.SendGroupMsg(push.S, push.Dst)
 	}
 }
