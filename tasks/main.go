@@ -28,13 +28,12 @@ func Boot() {
 				go runWorkflow(3600, t)
 				maxCounter = true
 			}
-			if maxCounter {	
+			if maxCounter {
 				tickCounter = 0
 				maxCounter = false
 			}
 		case t := <-debug_ticker.C:
 			fmt.Printf("占位计时器. %v\n", t.Unix())
-			//runWorkflow(10, t)
 		}
 	}
 }
@@ -59,11 +58,7 @@ func runTask(i int, t time.Time, task utils.AnalysisTask) {
 		return
 	}
 
-	fmt.Printf("debug: result found\n")
-
 	data = utils.KeywordFilter(task, data)
-
-	fmt.Printf("debug: filtered data %v\n", data)
 
 	recentItems, err := utils.GetDataDB(task.TaskID)
 	if err != nil {
