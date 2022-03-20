@@ -23,6 +23,5 @@ logs/*
 
 *_test.go
 
-database/connector.go
 *.txt
 config.yml

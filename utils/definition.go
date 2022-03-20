@@ -36,7 +36,7 @@ type GroupWhitelist struct {
 
 type PushMsg struct {
 	Dst int64
-	S   string
+	S   []string
 }
 
 func concatKeyword(keywords []string) string {

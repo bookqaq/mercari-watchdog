@@ -8,6 +8,8 @@ require (
 	go.mongodb.org/mongo-driver v1.8.3
 )
 
+require github.com/google/uuid v1.3.0 // indirect
+
 require (
 	github.com/0ojixueseno0/go-Pichubot v0.3.7
 	github.com/fatih/color v1.7.0 // indirect

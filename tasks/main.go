@@ -28,7 +28,7 @@ func Boot() {
 				go runWorkflow(3600, t)
 				maxCounter = true
 			}
-			if maxCounter {
+			if maxCounter {	
 				tickCounter = 0
 				maxCounter = false
 			}

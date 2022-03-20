@@ -55,10 +55,15 @@ func deleteTask(tasks []int32) error { //未来会添加信息所属的验证
 func translateParams(params []string) (utils.AnalysisTask, error) {
 	pmap := make(map[string]string, 4)
 	for _, item := range params {
-		tmp := strings.Split(item, ":")
-		if len(tmp) != 2 {
+		splitindex := strings.Index(item, ":")
+		if splitindex == -1 {
 			return utils.AnalysisTask{}, fmt.Errorf("参数获取出了问题")
 		}
+		contmp := strings.TrimLeft(item[splitindex:], ":")
+		if contmp == "" {
+			return utils.AnalysisTask{}, fmt.Errorf("参数获取出了问题")
+		}
+		tmp := []string{item[:splitindex], contmp}
 		pmap[tmp[0]] = strings.Trim(tmp[1], " ")
 	}
 	if len(pmap) != 4 {
