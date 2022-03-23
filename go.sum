@@ -2,6 +2,8 @@ github.com/0ojixueseno0/go-Pichubot v0.3.7 h1:fIAhtm4RAj/rhyeoNcBc5gWXtnamh/w1YW
 github.com/0ojixueseno0/go-Pichubot v0.3.7/go.mod h1:1mUPIl6dVigx+7I18A7oRTrc7Y4AGNBj4SC8DEMIQvA=
 github.com/bep/debounce v1.2.0 h1:wXds8Kq8qRfwAOpAxHrJDbCXgC5aHSzgQb/0gKsHQqo=
 github.com/bep/debounce v1.2.0/go.mod h1:H8yggRPQKLUhUoqrJC1bO2xNya7vanpDl7xR3ISbCJ0=
+github.com/bookqaq/goForMercari v0.1.1 h1:hNRe3fX0kFwNOue4aErkkaotFizZIMLAXeaeHln7Oj0=
+github.com/bookqaq/goForMercari v0.1.1/go.mod h1:KNfq9/K5Oometxhn4EV/OkWFz5ywFO2kpe1HzYv2hng=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

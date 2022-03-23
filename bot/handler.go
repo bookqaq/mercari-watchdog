@@ -24,7 +24,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			return
 		}
 		PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: []string{msg}}
-	case msgarr[0] == "查询":
+	case msgarr[0] == "debug查询":
 		res, err := utils.GetTasksByQQ(e.Sender.UserID)
 		if err != nil {
 			PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}

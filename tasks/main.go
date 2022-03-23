@@ -1,13 +1,18 @@
 package tasks
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
+	"net/url"
 	"time"
 
 	"bookq.xyz/mercariWatchdog/bot"
 	"bookq.xyz/mercariWatchdog/compare"
 	"bookq.xyz/mercariWatchdog/utils"
 	"github.com/bookqaq/goForMercari/mercarigo"
+	merwrapper "github.com/bookqaq/mer-wrapper"
+	"github.com/google/uuid"
 )
 
 func Boot() {
@@ -39,6 +44,18 @@ func Boot() {
 }
 
 func runWorkflow(interval int, t time.Time) {
+	proxyUrl := "http://127.0.0.1:12355"
+	proxy, _ := url.Parse(proxyUrl)
+	tr := &http.Transport{
+		Proxy:           http.ProxyURL(proxy),
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	merwrapper.Client.Content = &http.Client{
+		Transport: tr,
+	}
+
+	merwrapper.Client.ClientID = uuid.NewString()
 	taskResults, err := utils.GetAllTasks(interval)
 	if err != nil {
 		fmt.Printf("error during processing workflow %s : %v", t, interval)
@@ -58,14 +75,12 @@ func runTask(i int, t time.Time, task utils.AnalysisTask) {
 		return
 	}
 
-	data = utils.KeywordFilter(task, data)
-
 	recentItems, err := utils.GetDataDB(task.TaskID)
 	if err != nil {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
-	result, err := compare.Run(data, recentItems, task)
+	result, err := compare.Run2(data, recentItems, task)
 	if err != nil {
 		fmt.Printf("failed to compare, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return

@@ -157,6 +157,8 @@ func PriceFilter(task AnalysisTask, data []mercarigo.MercariItem) []mercarigo.Me
 				result = append(result, item)
 			}
 		}
+	} else {
+		return data
 	}
 	return result
 }
@@ -174,13 +176,13 @@ func addTaskBuffer() {
 
 func addTasks() {
 	lock.Lock()
-	defer lock.Unlock()
 	data := make([]interface{}, len(tasksToAdd))
 	for i, task := range tasksToAdd {
 		task.ID = primitive.NewObjectID()
 		data[i] = task
 	}
 	tasksToAdd = make([]AnalysisTask, 0)
+	lock.Unlock()
 	coll := db.Collection("AnalysisTask")
 	_, err := coll.InsertMany(context.TODO(), data)
 	if err != nil {

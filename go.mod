@@ -1,14 +1,14 @@
 module bookq.xyz/mercariWatchdog
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bep/debounce v1.2.0
-	github.com/bookqaq/goForMercari v0.0.0
+	github.com/bookqaq/goForMercari v0.1.1
+	github.com/bookqaq/mer-wrapper v0.0.0
+	github.com/google/uuid v1.3.0
 	go.mongodb.org/mongo-driver v1.8.3
 )
-
-require github.com/google/uuid v1.3.0 // indirect
 
 require (
 	github.com/0ojixueseno0/go-Pichubot v0.3.7
@@ -32,4 +32,6 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 )
 
-replace github.com/bookqaq/goForMercari => ../goForMercari
+replace github.com/bookqaq/mer-wrapper => ../mer-wrapper
+
+//replace github.com/bookqaq/goForMercari => ../goForMercari
