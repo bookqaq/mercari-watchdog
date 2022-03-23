@@ -121,7 +121,10 @@ func translateParams(params []string) (utils.AnalysisTask, error) {
 	if !ok {
 		return utils.AnalysisTask{}, fmt.Errorf("解析关键词失败")
 	}
+	tmp = strings.Replace(tmp, " ", "，", -1)
 	satmp = strings.Split(tmp, "，")
+	deleted := utils.DeleteInvalidItem(satmp, "")
+	satmp = satmp[:len(satmp)-deleted]
 	task.Keywords = satmp
 
 	return task, nil

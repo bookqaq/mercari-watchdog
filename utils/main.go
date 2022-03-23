@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -188,4 +189,16 @@ func addTasks() {
 	if err != nil {
 		fmt.Printf("err inserting tasks from buffer, %s\n", err)
 	}
+}
+
+func DeleteInvalidItem[T any](src []T, value T) int {
+	deleted, formerpt, length := 0, 0, len(src)
+	for i := 0; i < length; i++ {
+		for ; reflect.DeepEqual(src[i], value); i++ {
+			deleted++
+		}
+		src[formerpt] = src[i]
+		formerpt++
+	}
+	return deleted
 }

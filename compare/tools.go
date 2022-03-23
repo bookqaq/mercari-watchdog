@@ -1,10 +1,10 @@
 package compare
 
 import (
-	"reflect"
 	"strings"
 	"unicode/utf8"
 
+	"bookq.xyz/mercariWatchdog/utils"
 	"github.com/bookqaq/goForMercari/mercarigo"
 )
 
@@ -24,7 +24,7 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		return true
 	}
 	descrpition_arr := strings.Split(strings.ReplaceAll(description, "\n", " "), " ")
-	del_count := deleteInvalidItem(descrpition_arr, "")
+	del_count := utils.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
 	var word_mark [][2]int
@@ -63,18 +63,6 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 	}
 
 	return false
-}
-
-func deleteInvalidItem[T any](src []T, value T) int {
-	deleted, formerpt, length := 0, 0, len(src)
-	for i := 0; i < length; i++ {
-		for ; reflect.DeepEqual(src[i], value); i++ {
-			deleted++
-		}
-		src[formerpt] = src[i]
-		formerpt++
-	}
-	return deleted
 }
 
 func cutKnownKensaku(arr []string, pos [2]int) {
