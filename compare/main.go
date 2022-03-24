@@ -50,16 +50,15 @@ func Run2(data []mercarigo.MercariItem, recentData utils.AnalysisData, task util
 	data = data[:i]
 	data = utils.PriceFilter(task, data)
 
-	//fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
-	for i, item := range data {
+	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
+	for _, item := range data {
 		desc, err := merwrapper.Client.Item(item.ProductId)
 		if err != nil {
 			return nil, err
 		}
 		if compDescriptionFilter(task.Keywords, item.ProductName, desc.Description) {
-			//fdata = append(fdata, item)
-			data[i].ProductName += " 该项目通过了filter"
+			fdata = append(fdata, item)
 		}
 	}
-	return data, nil
+	return fdata, nil
 }
