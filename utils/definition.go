@@ -39,10 +39,10 @@ type PushMsg struct {
 	S   []string
 }
 
-func concatKeyword(keywords []string) string {
+func ConcatKeyword(keywords []string) string {
 	kwstring := keywords[0]
 	for _, item := range keywords[1:] {
-		kwstring += ","
+		kwstring += " "
 		kwstring += item
 	}
 	return kwstring
@@ -50,12 +50,12 @@ func concatKeyword(keywords []string) string {
 
 func (t *AnalysisTask) FormatSimplifiedChinese() string {
 	return fmt.Sprintf("任务ID:%v\n号主QQ:%v\n关键词:%s\n目标价格:%v~%v\n最大页数:%v 搜索间隔:%v",
-		t.TaskID, t.Owner, concatKeyword(t.Keywords), t.TargetPrice[0], t.TargetPrice[1], t.MaxPage, t.Interval)
+		t.TaskID, t.Owner, ConcatKeyword(t.Keywords), t.TargetPrice[0], t.TargetPrice[1], t.MaxPage, t.Interval)
 }
 
 func (d *AnalysisData) FormatSimplifiedChinese() []string {
 	res := make([]string, 1)
-	res[0] = fmt.Sprintf("任务ID:%v\n关键词:%s\n时间:%v\n蹲到符合要求的结果数为%v", d.TaskID, concatKeyword(d.Keywords), d.Time, d.Length)
+	res[0] = fmt.Sprintf("任务ID:%v\n关键词:%s\n时间:%v\n蹲到符合要求的结果数为%v", d.TaskID, ConcatKeyword(d.Keywords), d.Time, d.Length)
 
 	if d.Length > 0 {
 		for _, item := range d.Data {

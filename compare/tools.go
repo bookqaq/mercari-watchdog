@@ -20,9 +20,6 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 }
 
 func compDescriptionFilter(keywords []string, title string, description string) bool {
-	if len(keywords) == 1 {
-		return true
-	}
 	descrpition_arr := strings.Split(strings.ReplaceAll(description, "\n", " "), " ")
 	del_count := utils.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]

@@ -1,10 +1,7 @@
 package tasks
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
-	"net/url"
 	"time"
 
 	"bookq.xyz/mercariWatchdog/bot"
@@ -44,16 +41,15 @@ func Boot() {
 }
 
 func runWorkflow(interval int, t time.Time) {
-	proxyUrl := "http://127.0.0.1:12355"
-	proxy, _ := url.Parse(proxyUrl)
-	tr := &http.Transport{
-		Proxy:           http.ProxyURL(proxy),
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	merwrapper.Client.Content = &http.Client{
-		Transport: tr,
-	}
+	//proxyUrl := "http://127.0.0.1:12355"
+	//proxy, _ := url.Parse(proxyUrl)
+	//tr := &http.Transport{
+	//	Proxy:           http.ProxyURL(proxy),
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	//}
+	//merwrapper.Client.Content = &http.Client{
+	//	Transport: tr,
+	//}
 
 	merwrapper.Client.ClientID = uuid.NewString()
 	taskResults, err := utils.GetAllTasks(interval)
@@ -69,7 +65,7 @@ func runWorkflow(interval int, t time.Time) {
 
 func runTask(i int, t time.Time, task utils.AnalysisTask) {
 	fmt.Printf("debug: task %v run\n", task.TaskID)
-	data, err := mercarigo.Mercari_search(task.Keywords[0], task.Sort, task.Order, "", 30, task.MaxPage)
+	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
