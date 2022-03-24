@@ -17,7 +17,7 @@ var Config = struct {
 	const_V2Kensaku:     "検索用",
 	V2MinimumRuneLength: 14,
 	V2MinmumLineCount:   10,
-	V2KeywordMatchMin:   0.25,
+	V2KeywordMatchMin:   0.4,
 }
 
 // implement compare, updated methods would be available in future

@@ -90,7 +90,7 @@ func UpdateDataDB(data AnalysisData) error {
 }
 
 func InsertDataDB(task AnalysisTask) error {
-	result, err := mercarigo.Mercari_search(task.Keywords[0], task.Sort, task.Order, "", 30, 3)
+	result, err := mercarigo.Mercari_search(ConcatKeyword(task.Keywords), task.Sort, task.Order, "", 30, 3)
 	if err != nil {
 		return err
 	}
@@ -194,11 +194,12 @@ func addTasks() {
 func DeleteInvalidItem[T any](src []T, value T) int {
 	deleted, formerpt, length := 0, 0, len(src)
 	for i := 0; i < length; i++ {
-		for ; reflect.DeepEqual(src[i], value); i++ {
+		if reflect.DeepEqual(src[i], value) {
 			deleted++
+		} else {
+			src[formerpt] = src[i]
+			formerpt++
 		}
-		src[formerpt] = src[i]
-		formerpt++
 	}
 	return deleted
 }

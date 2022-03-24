@@ -20,7 +20,7 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 }
 
 func compDescriptionFilter(keywords []string, title string, description string) bool {
-	descrpition_arr := strings.Split(strings.ReplaceAll(description, "\n", " "), " ")
+	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0'}, ' '), " ")
 	del_count := utils.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
@@ -60,6 +60,19 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 	}
 
 	return false
+}
+
+func StringMultipleReplacer(s string, old []rune, new rune) string {
+	r := []rune(s)
+	for i, v := range r {
+		for _, item := range old {
+			if v == item {
+				r[i] = ' '
+				break
+			}
+		}
+	}
+	return string(r)
 }
 
 func cutKnownKensaku(arr []string, pos [2]int) {
