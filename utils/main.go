@@ -44,10 +44,10 @@ func GetAllTasks(interval int) ([]AnalysisTask, error) {
 	return result, nil
 }
 
-func GetTasksByQQ(qq int64) ([]AnalysisTask, error) {
+func GetTasksByQQ(qq int64, group int64) ([]AnalysisTask, error) {
 	var result []AnalysisTask
 	coll := db.Collection("AnalysisTask")
-	cursor, err := coll.Find(context.TODO(), bson.D{primitive.E{Key: "owner", Value: qq}})
+	cursor, err := coll.Find(context.TODO(), bson.D{primitive.E{Key: "owner", Value: qq}, primitive.E{Key: "group", Value: group}})
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func UpdateDataDB(data AnalysisData) error {
 }
 
 func InsertDataDB(task AnalysisTask) error {
-	result, err := mercarigo.Mercari_search(ConcatKeyword(task.Keywords), task.Sort, task.Order, "", 30, 3)
+	result, err := mercarigo.Mercari_search(ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, 3)
 	if err != nil {
 		return err
 	}

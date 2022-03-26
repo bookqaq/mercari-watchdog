@@ -15,7 +15,7 @@ var Config = struct {
 	V2KeywordMatchMin   float32
 }{
 	const_V2Kensaku:     "検索用",
-	V2MinimumRuneLength: 14,
+	V2MinimumRuneLength: 15,
 	V2MinmumLineCount:   10,
 	V2KeywordMatchMin:   0.4,
 }

@@ -65,7 +65,7 @@ func runWorkflow(interval int, t time.Time) {
 
 func runTask(i int, t time.Time, task utils.AnalysisTask) {
 	fmt.Printf("debug: task %v run\n", task.TaskID)
-	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "", 30, task.MaxPage)
+	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
