@@ -19,7 +19,7 @@ gocqhttp/*
 bot/logs/*
 data/*
 logs/*
-
+.vscode/*
 
 *_test.go
 

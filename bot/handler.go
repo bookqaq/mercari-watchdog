@@ -15,7 +15,10 @@ var TIME_1H_STRING = []string{"1时", "1小时", "一小时", "60分", "3600秒"
 var PushMsgChan chan utils.PushMsg
 
 func handlerGroupMsg(e Pichubot.MessageGroup) {
-	msgarr := strings.Split(e.Message, "\n")
+	msgarr := strings.Split(e.RawMessage, "\n")
+	for i := 0; i < len(msgarr); i++ {
+		msgarr[i] = strings.TrimRight(msgarr[i], "\r")
+	}
 	switch {
 	case msgarr[0] == "蹲煤":
 		msg, err := createTask(msgarr[1:], e.Sender.UserID, e.GroupID)
