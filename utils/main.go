@@ -30,6 +30,14 @@ func Init() {
 
 // DB oriented:
 
+func IfTaskExist(taskID int32) bool {
+	coll := db.Collection("AnalysisTask")
+	if err := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}}).Err(); err == mongo.ErrNoDocuments {
+		return true
+	}
+	return false
+}
+
 func GetAllTasks(interval int) ([]AnalysisTask, error) {
 	coll := db.Collection("AnalysisTask")
 	cursor, err := coll.Find(context.TODO(), bson.D{primitive.E{Key: "interval", Value: interval}})
@@ -58,9 +66,9 @@ func GetTasksByQQ(qq int64, group int64) ([]AnalysisTask, error) {
 	return result, nil
 }
 
-func DeleteTask(taskID int32) error {
+func DeleteTask(taskID int32, qq int64) error {
 	coll := db.Collection("AnalysisTask")
-	res, err := coll.DeleteOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}})
+	res, err := coll.DeleteOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}, primitive.E{Key: "owner", Value: qq}})
 	if err != nil {
 		return err
 	}

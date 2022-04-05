@@ -11,7 +11,7 @@ import (
 	Pichubot "github.com/0ojixueseno0/go-Pichubot"
 )
 
-var TIME_1H_STRING = []string{"1时", "1小时", "60分", "3600秒"}
+var TIME_1H_STRING = []string{"1时", "1小时", "一小时", "60分", "3600秒"}
 var PushMsgChan chan utils.PushMsg
 
 func handlerGroupMsg(e Pichubot.MessageGroup) {
@@ -48,7 +48,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			}
 			idarr[i] = int32(tmp)
 		}
-		err := deleteTask(idarr)
+		err := deleteTask(idarr, e.Sender.UserID)
 		if err != nil {
 			PushMsgChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
 			return

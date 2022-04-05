@@ -38,13 +38,13 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	return result, nil
 }
 
-func deleteTask(tasks []int32) error { //未来会添加信息所属的验证
+func deleteTask(tasks []int32, qq int64) error { //未来会添加信息所属的验证
 	for _, item := range tasks {
-		err := utils.DeleteDataDB(item)
+		err := utils.DeleteTask(item, qq)
 		if err != nil {
 			return err
 		}
-		err = utils.DeleteTask(item)
+		err = utils.DeleteDataDB(item)
 		if err != nil {
 			return err
 		}
@@ -53,6 +53,16 @@ func deleteTask(tasks []int32) error { //未来会添加信息所属的验证
 }
 
 func translateParams(params []string) (utils.AnalysisTask, error) {
+	var tid int32
+	for utils.IfTaskExist(tid) {
+		tid = rand.Int31()
+	}
+	task := utils.AnalysisTask{}
+	task.ID = primitive.NewObjectID()
+	task.TaskID = tid
+	task.Sort = "created_time"
+	task.Order = "desc"
+
 	pmap := make(map[string]string, 4)
 	for _, item := range params {
 		splitindex := strings.Index(item, ":")
@@ -69,12 +79,6 @@ func translateParams(params []string) (utils.AnalysisTask, error) {
 	if len(pmap) != 4 {
 		return utils.AnalysisTask{}, fmt.Errorf("可能检测到了重复参数")
 	}
-
-	task := utils.AnalysisTask{}
-	task.ID = primitive.NewObjectID()
-	task.TaskID = rand.Int31()
-	task.Sort = "created_time"
-	task.Order = "desc"
 
 	tmp, ok := pmap["目标价格"]
 	if !ok {
