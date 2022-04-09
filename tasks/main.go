@@ -12,11 +12,23 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	TaskRoutines = 5
+)
+
+var taskChans []chan utils.AnalysisTask
+
 func Boot() {
 	utils.Init()
 
 	debug_ticker := time.NewTicker(18400 * time.Second)
 	ticker_10m := time.NewTicker(600 * time.Second)
+
+	taskChans = make([]chan utils.AnalysisTask, TaskRoutines)
+	for i := 0; i < TaskRoutines; i++ {
+		taskChans[i] = make(chan utils.AnalysisTask, 5)
+		go taskChanListener(taskChans[i])
+	}
 
 	tickCounter := 0
 	maxCounter := false
@@ -40,6 +52,13 @@ func Boot() {
 	}
 }
 
+func taskChanListener(taskInput <-chan utils.AnalysisTask) {
+	for {
+		task := <-taskInput
+		runTask(time.Now(), task)
+	}
+}
+
 func runWorkflow(interval int, t time.Time) {
 	//proxyUrl := "http://127.0.0.1:12355"
 	//proxy, _ := url.Parse(proxyUrl)
@@ -59,12 +78,12 @@ func runWorkflow(interval int, t time.Time) {
 	}
 
 	for i, taskItem := range taskResults {
-		go runTask(i, t, taskItem)
+		taskChans[i%5] <- taskItem
 	}
 }
 
-func runTask(i int, t time.Time, task utils.AnalysisTask) {
-	fmt.Printf("debug: task %v run\n", task.TaskID)
+func runTask(t time.Time, task utils.AnalysisTask) {
+	//fmt.Printf("debug: task %v run\n", task.TaskID)
 	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())

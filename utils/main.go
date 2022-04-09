@@ -33,9 +33,9 @@ func Init() {
 func IfTaskExist(taskID int32) bool {
 	coll := db.Collection("AnalysisTask")
 	if err := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "taskID", Value: taskID}}).Err(); err == mongo.ErrNoDocuments {
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 func GetAllTasks(interval int) ([]AnalysisTask, error) {
