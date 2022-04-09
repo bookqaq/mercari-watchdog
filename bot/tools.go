@@ -54,6 +54,7 @@ func deleteTask(tasks []int32, qq int64) error { //未来会添加信息所属�
 
 func translateParams(params []string) (utils.AnalysisTask, error) {
 	var tid int32
+	tid = rand.Int31()
 	for utils.IfTaskExist(tid) {
 		tid = rand.Int31()
 	}
