@@ -1,4 +1,4 @@
-package utils
+package database
 
 import (
 	"context"
@@ -10,7 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Connect() *mongo.Database {
+var DB *mongo.Database
+
+func Connect() {
 
 	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017/?readPreference=primary&ssl=false")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -24,5 +26,5 @@ func Connect() *mongo.Database {
 	}
 	db := client.Database("mercariWatchdogDatabase")
 
-	return db
+	DB = db
 }

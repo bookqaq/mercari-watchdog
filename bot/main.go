@@ -20,7 +20,7 @@ func Boot() {
 	Pichubot.Listeners.OnGroupRequest = append(Pichubot.Listeners.OnGroupRequest, handlerGroupRequest)
 	bot := Pichubot.NewBot()
 	bot.Config = Pichubot.Config{
-		Loglvl:   Pichubot.LOGGER_LEVEL_INFO,
+		Loglvl:   Pichubot.LOGGER_LEVEL_WARNING,
 		Host:     "127.0.0.1:28285",
 		MasterQQ: 295589844,
 		Path:     "/",

@@ -19,6 +19,7 @@ gocqhttp/*
 bot/logs/*
 data/*
 logs/*
+resource/ssl/*
 .vscode/*
 
 *_test.go

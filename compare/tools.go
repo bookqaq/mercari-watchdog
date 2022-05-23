@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"bookq.xyz/mercariWatchdog/utils"
+	"bookq.xyz/mercariWatchdog/utils/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 )
 
@@ -21,14 +21,14 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 
 func compDescriptionFilter(keywords []string, title string, description string) bool {
 	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
-	del_count := utils.DeleteInvalidItem(descrpition_arr, "")
+	del_count := tools.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
 	var word_mark [][2]int
 	for i, item := range descrpition_arr {
-		if strings.Contains(item, Config.const_V2Kensaku) {
+		if strings.Contains(item, Config.const_Kensaku) {
 			tmp := getKnownKensaku(descrpition_arr, i)
-			if len(tmp) >= Config.V2MinmumLineCount {
+			if len(tmp) >= Config.MinmumLineCount {
 				word_mark = append(word_mark, tmp)
 			}
 			break
@@ -48,18 +48,13 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
 	}
 
-	contain_count := 0
 	for _, item := range keywords {
-		if strings.Contains(title, item) {
-			contain_count++
+		if !strings.Contains(title, item) {
+			return false
 		}
 	}
 
-	if float32(contain_count)/float32(len(keywords)) >= Config.V2KeywordMatchMin {
-		return true
-	}
-
-	return false
+	return true
 }
 
 func StringMultipleReplacer(s string, old []rune, new rune) string {
@@ -85,7 +80,7 @@ func getKnownKensaku(arr []string, start int) [2]int {
 	var mark [2]int
 	mark[0] = start
 	for i := start; i < len(arr); i++ {
-		if linelen := utf8.RuneCount([]byte(arr[i])); linelen <= 0 || linelen > Config.V2MinimumRuneLength {
+		if linelen := utf8.RuneCount([]byte(arr[i])); linelen <= 0 || linelen > Config.MinimumRuneLength {
 			break
 		}
 		mark[1] = i
@@ -99,16 +94,16 @@ func betKensaku(arr []string) [][2]int {
 
 	for i := 0; i < conlen; i++ {
 		var mark [2]int
-		if linelen := utf8.RuneCount([]byte(arr[i])); linelen > 0 && linelen < Config.V2MinimumRuneLength {
+		if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumLineCount {
 			mark[0] = i
 			for i++; i < conlen; i++ {
-				if linelen := utf8.RuneCount([]byte(arr[i])); linelen > 0 && linelen < Config.V2MinimumRuneLength {
+				if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumLineCount {
 					mark[1] = i
 				} else {
 					break
 				}
 			}
-			if mark[1]-mark[0] > Config.V2MinmumLineCount {
+			if mark[1]-mark[0] > Config.MinmumLineCount {
 				mark_storage = append(mark_storage, mark)
 			}
 		}
