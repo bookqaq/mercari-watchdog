@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bookq.xyz/mercariWatchdog/bot"
-	"bookq.xyz/mercariWatchdog/tasks"
-	"bookq.xyz/mercariWatchdog/webapi"
+	"bookq.xyz/mercari-watchdog/bot"
+	"bookq.xyz/mercari-watchdog/tasks"
+	"bookq.xyz/mercari-watchdog/webapi"
 )
 
 func main() {
