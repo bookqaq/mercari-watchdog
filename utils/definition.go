@@ -3,14 +3,7 @@ package utils
 import (
 	"fmt"
 	"strings"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type GroupWhitelist struct {
-	ID    primitive.ObjectID `bson:"_id"`
-	Group int64              `bson:"group"`
-}
 
 type PushMsg struct {
 	Dst int64

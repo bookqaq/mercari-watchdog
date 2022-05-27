@@ -19,6 +19,7 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 	return i
 }
 
+// format item description and process
 func compDescriptionFilter(keywords []string, title string, description string) bool {
 	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
 	del_count := tools.DeleteInvalidItem(descrpition_arr, "")
@@ -57,6 +58,8 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 	return true
 }
 
+// Replace rune to new in s if rune in old
+// TODO: Change old to map[rune]struct{}
 func StringMultipleReplacer(s string, old []rune, new rune) string {
 	r := []rune(s)
 	for i, v := range r {

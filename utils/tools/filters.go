@@ -23,7 +23,7 @@ func KeywordFilter(keywords []string, data []mercarigo.MercariItem) []mercarigo.
 
 // Return items that price in task.TargetPrice
 func PriceFilter(price [2]int, data []mercarigo.MercariItem) []mercarigo.MercariItem {
-	result := make([]mercarigo.MercariItem, 0)
+	result := make([]mercarigo.MercariItem, 0, len(data))
 	if price[0] >= 0 && price[1] >= price[0] {
 		for _, item := range data {
 			if item.Price >= price[0] && item.Price <= price[1] {

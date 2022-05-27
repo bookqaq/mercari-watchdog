@@ -11,7 +11,7 @@ import (
 )
 
 func Insert(data TaskAddFetchData) error {
-	coll := database.DB.Collection("TmpTaskAddFetch")
+	coll := database.DB.Collection("TaskAddFetch")
 	_, err := coll.InsertOne(context.TODO(), data)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func Insert(data TaskAddFetchData) error {
 }
 
 func GetOne(auth string) (TaskAddFetchData, error) {
-	coll := database.DB.Collection("TmpTaskAddFetch")
+	coll := database.DB.Collection("TaskAddFetch")
 	res := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "auth", Value: auth}})
 	if err := res.Err(); err != nil {
 		return TaskAddFetchData{}, err
@@ -34,7 +34,7 @@ func GetOne(auth string) (TaskAddFetchData, error) {
 }
 
 func IfExist(auth string) bool {
-	coll := database.DB.Collection("TmpTaskAddFetch")
+	coll := database.DB.Collection("TaskAddFetch")
 	if err := coll.FindOne(context.TODO(), bson.D{primitive.E{Key: "auth", Value: auth}}).Err(); err != nil {
 		return false
 	}
@@ -42,7 +42,7 @@ func IfExist(auth string) bool {
 }
 
 func Delete(auth string) bool {
-	coll := database.DB.Collection("TmpTaskAddFetch")
+	coll := database.DB.Collection("TaskAddFetch")
 	if err := coll.FindOneAndDelete(context.TODO(), bson.D{primitive.E{Key: "auth", Value: auth}}).Err(); err != nil {
 		return false
 	}
@@ -50,7 +50,7 @@ func Delete(auth string) bool {
 }
 
 func ClearExpired() {
-	coll := database.DB.Collection("TmpTaskAddFetch")
+	coll := database.DB.Collection("TaskAddFetch")
 	_, err := coll.DeleteMany(
 		context.TODO(),
 		bson.D{{

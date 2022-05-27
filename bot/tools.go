@@ -14,6 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const (
+	merbot_tadd_link = "https://merbot.bookq.xyz/task/add/"
+)
+
 func createTask(params []string, qq int64, group int64) (string, error) {
 	var result string
 	switch {
@@ -65,7 +69,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	result = fmt.Sprintf("在这个页面里也可以添加任务:%s\n%s", authkey, result)
+	result = fmt.Sprintf("在这个页面里也可以添加任务:%s%s\n%s", merbot_tadd_link, authkey, result)
 	return result, nil
 }
 

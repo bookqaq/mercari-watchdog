@@ -54,7 +54,7 @@ func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	for {
 		task := <-taskInput
 		runTask(time.Now(), task)
-		time.Sleep(8 * time.Second)
+		time.Sleep(6 * time.Second)
 	}
 }
 

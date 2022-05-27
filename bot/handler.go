@@ -2,7 +2,6 @@ package bot
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"bookq.xyz/mercari-watchdog/utils"
 	"bookq.xyz/mercari-watchdog/utils/analysisdata"
 	"bookq.xyz/mercari-watchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/utils/group"
 
 	Pichubot "github.com/0ojixueseno0/go-Pichubot"
 )
@@ -35,12 +35,14 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
 			return
 		}
-		msg := "任务:"
+		var msgbuilder strings.Builder
+		msgbuilder.Grow(1024)
+		msgbuilder.WriteString("任务:")
 		for _, item := range res {
-			msg += "\n"
-			msg += item.FormatSimplifiedChinese()
+			msgbuilder.WriteString("\n")
+			msgbuilder.WriteString(item.FormatSimplifiedChinese())
 		}
-		OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{msg}}
+		OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{msgbuilder.String()}}
 	case strings.Index(msgarr[0], "删除") == 0:
 		tmp := strings.Trim(msgarr[0], "删除")
 		msgarr = strings.Split(tmp, " ")
@@ -73,7 +75,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 
 // Accept Group invite that in collection GroupWhitelist
 func handlerGroupRequest(r Pichubot.GroupRequest) {
-	res, err := utils.FindWhitelist(r.GroupId)
+	res, err := group.FindWhitelist(r.GroupId)
 	if err != nil || !res {
 		Pichubot.SetGroupInviteRequest(r.Flag, res, "可能不在白名单内")
 	}
@@ -86,29 +88,24 @@ func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 		return
 	}
 
-	// utils.PushMsg.S must be []string
-	msgarr := data.FormatSimplifiedChinese()
-	msgarr[0] = fmt.Sprintf("[CQ:at,qq=%v]\n", owner) + msgarr[0]
-	if len(msgarr) >= 5 {
-		msgarr = msgarr[:6]
-	}
+	msg := data.FormatSimplifiedChinese()
+	msg = fmt.Sprintf("[CQ:at,qq=%v]\n%s", owner, msg)
 
-	content := utils.PushMsg{Dst: group, S: msgarr}
-	switch (len(msgarr) - 1) / 2 {
+	// utils.PushMsg.S must be []string
+	content := utils.PushMsg{Dst: group, S: []string{msg}}
+	switch data.Length / 2 {
 	case 0:
 		Push1to2Chan <- content
 	case 1:
 		Push3to4Chan <- content
-	case 2:
-		Push5upChan <- content
 	default:
-		content.S = []string{fmt.Sprintf("任务可能超长了，长度为%d", len(msgarr)-1)}
-		OperationChan <- content
+		Push5upChan <- content
 	}
 }
 
 // Push channel with priority
 func msgPushService() {
+	tick := time.Tick(3 * time.Second)
 	for {
 		select {
 		case push := <-OperationChan:
@@ -141,11 +138,11 @@ func msgPushService() {
 				}
 			}
 		}
+		<-tick
 	}
 }
 
 func pushCore(push utils.PushMsg) {
-	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 	for _, item := range push.S {
 		Pichubot.SendGroupMsg(item, push.Dst)
 	}
