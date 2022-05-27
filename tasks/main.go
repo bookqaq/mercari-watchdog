@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/bot"
-	"bookq.xyz/mercariWatchdog/compare"
-	"bookq.xyz/mercariWatchdog/utils"
-	"bookq.xyz/mercariWatchdog/utils/analysisdata"
-	"bookq.xyz/mercariWatchdog/utils/analysistask"
-	"bookq.xyz/mercariWatchdog/utils/fetchdata"
+	"bookq.xyz/mercari-watchdog/bot"
+	"bookq.xyz/mercari-watchdog/compare"
+	"bookq.xyz/mercari-watchdog/utils"
+	"bookq.xyz/mercari-watchdog/utils/analysisdata"
+	"bookq.xyz/mercari-watchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/utils/fetchdata"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
 	"github.com/google/uuid"
@@ -54,6 +54,7 @@ func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	for {
 		task := <-taskInput
 		runTask(time.Now(), task)
+		time.Sleep(8 * time.Second)
 	}
 }
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/database"
+	"bookq.xyz/mercari-watchdog/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

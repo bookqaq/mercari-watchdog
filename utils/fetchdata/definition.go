@@ -1,10 +1,8 @@
 package fetchdata
 
 type TaskAddFetchData struct {
-	Auth     string          `json:"auth" bson:""auth`
-	Settings FetchedSettings `json:"settings" bson:"settings"`
-	Override FetchOverride   `json:"override" bson:"override"`
-	Expire   int64           `json:"exp" bson:"exp"`
+	Auth     string        `json:"auth" bson:"auth"`
+	Override FetchOverride `json:"override" bson:"override"`
 }
 type Interval struct {
 	Time int    `json:"time" bson:"time"`

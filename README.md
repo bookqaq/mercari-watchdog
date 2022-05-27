@@ -1,4 +1,4 @@
-# mercariWatchdog
+# mercari-watchdog
 
 WIP
 

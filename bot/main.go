@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"bookq.xyz/mercariWatchdog/utils"
+	"bookq.xyz/mercari-watchdog/utils"
 	Pichubot "github.com/0ojixueseno0/go-Pichubot"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/utils/tools"
+	"bookq.xyz/mercari-watchdog/utils/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

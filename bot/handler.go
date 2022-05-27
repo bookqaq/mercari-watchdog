@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/utils"
-	"bookq.xyz/mercariWatchdog/utils/analysisdata"
-	"bookq.xyz/mercariWatchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/utils"
+	"bookq.xyz/mercari-watchdog/utils/analysisdata"
+	"bookq.xyz/mercari-watchdog/utils/analysistask"
+
 	Pichubot "github.com/0ojixueseno0/go-Pichubot"
 )
 

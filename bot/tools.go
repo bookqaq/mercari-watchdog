@@ -5,27 +5,14 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
-	"time"
 
-	"bookq.xyz/mercariWatchdog/utils/analysisdata"
-	"bookq.xyz/mercariWatchdog/utils/analysistask"
-	"bookq.xyz/mercariWatchdog/utils/fetchdata"
-	"bookq.xyz/mercariWatchdog/utils/tools"
+	"bookq.xyz/mercari-watchdog/utils/analysisdata"
+	"bookq.xyz/mercari-watchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/utils/fetchdata"
+	"bookq.xyz/mercari-watchdog/utils/tools"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-var config = struct {
-	Settings fetchdata.FetchedSettings
-}{
-	Settings: fetchdata.FetchedSettings{
-		Interval: []fetchdata.Interval{
-			{Time: 300, Text: "5分钟"},
-			{Time: 600, Text: "10分钟"},
-			{Time: 3600, Text: "1小时"},
-		},
-		PageRange: [2]int{1, 5},
-	}}
 
 func createTask(params []string, qq int64, group int64) (string, error) {
 	var result string
@@ -68,12 +55,10 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	}
 
 	fetchData := fetchdata.TaskAddFetchData{
-		Settings: config.Settings,
 		Override: fetchdata.FetchOverride{
 			Owner: qq,
 		},
-		Expire: time.Now().Unix() + 600,
-		Auth:   authkey,
+		Auth: authkey,
 	}
 
 	err := fetchdata.Insert(fetchData)

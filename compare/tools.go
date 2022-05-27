@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"bookq.xyz/mercariWatchdog/utils/tools"
+	"bookq.xyz/mercari-watchdog/utils/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 )
 

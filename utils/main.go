@@ -3,8 +3,8 @@ package utils
 import (
 	"context"
 
-	"bookq.xyz/mercariWatchdog/database"
-	"bookq.xyz/mercariWatchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/database"
+	"bookq.xyz/mercari-watchdog/utils/analysistask"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/database"
+	"bookq.xyz/mercari-watchdog/database"
 	"github.com/bep/debounce"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

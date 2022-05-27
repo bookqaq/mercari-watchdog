@@ -5,13 +5,35 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 
-	"bookq.xyz/mercariWatchdog/utils/analysisdata"
-	"bookq.xyz/mercariWatchdog/utils/analysistask"
-	"bookq.xyz/mercariWatchdog/utils/fetchdata"
+	"bookq.xyz/mercari-watchdog/utils/analysisdata"
+	"bookq.xyz/mercari-watchdog/utils/analysistask"
+	"bookq.xyz/mercari-watchdog/utils/fetchdata"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type fetchedSettingsReply struct {
+	expire   int64
+	settings fetchdata.FetchedSettings
+	override fetchdata.FetchOverride
+}
+
+var config = struct {
+	Settings fetchdata.FetchedSettings
+	Expire   int64
+}{
+	Settings: fetchdata.FetchedSettings{
+		Interval: []fetchdata.Interval{
+			{Time: 300, Text: "5分钟"},
+			{Time: 600, Text: "10分钟"},
+			{Time: 3600, Text: "1小时"},
+		},
+		PageRange: [2]int{1, 5},
+	},
+	Expire: 600,
+}
 
 func getAllRouters(router *gin.Engine) {
 	tasks := router.Group("/task")
@@ -41,10 +63,16 @@ func postTaskAddFetch(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, struct {
 		status string
-		data   fetchdata.TaskAddFetchData
+		data   fetchedSettingsReply
+		auth   string
 	}{
 		status: "ok",
-		data:   data,
+		data: fetchedSettingsReply{
+			expire:   time.Now().Unix() + config.Expire,
+			settings: config.Settings,
+			override: data.Override,
+		},
+		auth: data.Auth,
 	})
 }
 
