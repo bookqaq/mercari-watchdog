@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"bookq.xyz/mercari-watchdog/utils"
-	"bookq.xyz/mercari-watchdog/utils/analysisdata"
-	"bookq.xyz/mercari-watchdog/utils/analysistask"
-	"bookq.xyz/mercari-watchdog/utils/group"
+	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysistask"
+	"bookq.xyz/mercari-watchdog/datatype/group"
+	"bookq.xyz/mercari-watchdog/tools"
 
 	Pichubot "github.com/0ojixueseno0/go-Pichubot"
 )
@@ -32,14 +32,14 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 	case msgarr[0] == "蹲煤":
 		msg, err := createTask(msgarr[1:], e.Sender.UserID, e.GroupID)
 		if err != nil {
-			OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("添加失败了，这是调试用的error:%v", err)}}
+			OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("添加失败了，这是调试用的error:%v", err)}}
 			return
 		}
-		OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{msg}}
+		OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{msg}}
 	case msgarr[0] == "查询":
 		res, err := analysistask.GetByQQ(e.Sender.UserID, e.GroupID)
 		if err != nil {
-			OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
+			OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
 			return
 		}
 		var msgbuilder strings.Builder
@@ -49,7 +49,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 			msgbuilder.WriteString("\n")
 			msgbuilder.WriteString(item.FormatSimplifiedChinese())
 		}
-		OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{msgbuilder.String()}}
+		OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{msgbuilder.String()}}
 	case strings.Index(msgarr[0], "删除") == 0:
 		tmp := strings.Trim(msgarr[0], "删除")
 		msgarr = strings.Split(tmp, " ")
@@ -57,26 +57,26 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 		for i, item := range msgarr {
 			tmp, err := strconv.Atoi(item)
 			if err != nil {
-				OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{"任务编号转换失败了，请先确认输入是否是纯数字"}}
+				OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{"任务编号转换失败了，请先确认输入是否是纯数字"}}
 				return
 			}
 			idarr[i] = int32(tmp)
 		}
 		err := deleteTask(idarr, e.Sender.UserID)
 		if err != nil {
-			OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
+			OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{fmt.Sprintf("查询失败了，这是调试用的error:%v", err)}}
 			return
 		}
-		OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{"理论上是全部删除成功了(没给id的情况下当然也算成功)"}}
+		OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{"理论上是全部删除成功了(没给id的情况下当然也算成功)"}}
 	case msgarr[0] == "/pushMsg":
 		if e.Sender.UserID != Pichubot.PichuBot.Config.MasterQQ {
 			return
 		}
 		toGroup, err := strconv.ParseInt(msgarr[1], 10, 64)
 		if err != nil {
-			OperationChan <- utils.PushMsg{Dst: e.GroupID, S: []string{err.Error()}}
+			OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{err.Error()}}
 		}
-		OperationChan <- utils.PushMsg{Dst: toGroup, S: msgarr[2:]}
+		OperationChan <- tools.PushMsg{Dst: toGroup, S: msgarr[2:]}
 	}
 }
 
@@ -98,8 +98,8 @@ func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 	msg := data.FormatSimplifiedChinese()
 	msg = fmt.Sprintf("[CQ:at,qq=%v]\n%s", owner, msg)
 
-	// utils.PushMsg.S must be []string
-	content := utils.PushMsg{Dst: group, S: []string{msg}}
+	// tools.PushMsg.S must be []string
+	content := tools.PushMsg{Dst: group, S: []string{msg}}
 	switch data.Length / 2 {
 	case 0:
 		Push1to2Chan <- content
@@ -149,7 +149,7 @@ func msgPushService() {
 	}
 }
 
-func pushCore(push utils.PushMsg) {
+func pushCore(push tools.PushMsg) {
 	for _, item := range push.S {
 		Pichubot.SendGroupMsg(item, push.Dst)
 	}

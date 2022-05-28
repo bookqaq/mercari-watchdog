@@ -1,9 +1,9 @@
 package compare
 
 import (
-	"bookq.xyz/mercari-watchdog/utils/analysisdata"
-	"bookq.xyz/mercari-watchdog/utils/analysistask"
-	"bookq.xyz/mercari-watchdog/utils/tools"
+	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysistask"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
 )

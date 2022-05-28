@@ -1,14 +1,9 @@
-package utils
+package tools
 
 import (
 	"fmt"
 	"strings"
 )
-
-type PushMsg struct {
-	Dst int64
-	S   []string
-}
 
 func ConcatKeyword(keywords []string) string {
 	var builder strings.Builder

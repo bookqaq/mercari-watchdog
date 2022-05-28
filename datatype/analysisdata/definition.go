@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"bookq.xyz/mercari-watchdog/utils/tools"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

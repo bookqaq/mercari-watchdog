@@ -5,6 +5,7 @@ import (
 )
 
 func Boot() {
+	gin.SetMode("release")
 	router := gin.Default()
 	router.Use(corsHandler())
 

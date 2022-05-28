@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"bookq.xyz/mercari-watchdog/utils/analysisdata"
-	"bookq.xyz/mercari-watchdog/utils/analysistask"
-	"bookq.xyz/mercari-watchdog/utils/fetchdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysistask"
+	"bookq.xyz/mercari-watchdog/datatype/fetchdata"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

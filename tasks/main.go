@@ -6,10 +6,10 @@ import (
 
 	"bookq.xyz/mercari-watchdog/bot"
 	"bookq.xyz/mercari-watchdog/compare"
-	"bookq.xyz/mercari-watchdog/utils"
-	"bookq.xyz/mercari-watchdog/utils/analysisdata"
-	"bookq.xyz/mercari-watchdog/utils/analysistask"
-	"bookq.xyz/mercari-watchdog/utils/fetchdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
+	"bookq.xyz/mercari-watchdog/datatype/analysistask"
+	"bookq.xyz/mercari-watchdog/datatype/fetchdata"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
 	"github.com/google/uuid"
@@ -22,7 +22,8 @@ const (
 var taskChans []chan analysistask.AnalysisTask
 
 func Boot() {
-	utils.Init()
+	go analysistask.AddTaskBuffer()
+	go fetchdata.TickClearExpired(120 * time.Second)
 
 	ticker_10m := time.NewTicker(600 * time.Second)
 	ticker_1h := time.NewTicker(3600 * time.Second)
@@ -83,7 +84,7 @@ func runWorkflow(interval int, t time.Time) {
 
 func runTask(t time.Time, task analysistask.AnalysisTask) {
 	//fmt.Printf("debug: task %v run\n", task.TaskID)
-	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
+	data, err := mercarigo.Mercari_search(tools.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
