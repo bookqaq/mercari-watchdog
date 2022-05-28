@@ -23,10 +23,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	var result string
 	switch {
 	case len(params) == 0:
-		result = "格式:\n" + "蹲煤\n" +
-			"关键词:\n" + "目标价格:\n" + "搜索间隔:\n" + "搜索页数:\n" +
-			"以下是举例:\n" + "蹲煤\n" + "关键词:プロセカ グリッター缶バッジ\n" + "搜索间隔:1小时\n" + "目标价格:100，500\n" + "搜索页数:3"
-
+		result = "格式:\n蹲煤\n关键词:\n目标价格:\n搜索间隔:\n搜索页数:\n"
 	case len(params) == 4:
 		task, err := translateParams(params)
 		if err != nil {

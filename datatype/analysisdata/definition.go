@@ -29,7 +29,7 @@ func (d *AnalysisData) PrivlegedFormatSimplifiedChinese() []string {
 		for _, item := range d.Data {
 			tmp := fmt.Sprintf("[CQ:image,file=%s]名称:%s\n价格:%vyen\n状态:%s\n更新时间:%s\n链接:%s",
 				item.ImageURL[0], item.ProductName, item.Price, item.Status,
-				time.Unix(item.Updated, 0).In(location).Format("2006-01-02 15:04:05"), item.ProductId)
+				time.Unix(item.Updated, 0).In(location).Format("2006-01-02 15:04:05"), item.GetProductURL())
 			res = append(res, tmp)
 		}
 	}
@@ -45,7 +45,7 @@ func (d *AnalysisData) FormatSimplifiedChinese() string {
 	if d.Length > 0 {
 		for _, item := range d.Data {
 			builder.WriteString(fmt.Sprintf("\n[CQ:image,file=%s]\n名称:%s\n价格:%vyen\n商品id:%s",
-				item.ImageURL[0], item.ProductName, item.Price, item.ProductId))
+				item.ImageURL[0], item.ProductName, item.Price, item.GetProductURL()))
 		}
 	}
 	return builder.String()
