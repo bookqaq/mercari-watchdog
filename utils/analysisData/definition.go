@@ -44,7 +44,7 @@ func (d *AnalysisData) FormatSimplifiedChinese() string {
 
 	if d.Length > 0 {
 		for _, item := range d.Data {
-			builder.WriteString(fmt.Sprintf("[CQ:image,file=%s]\n名称:%s\n价格:%vyen\n商品id:%s",
+			builder.WriteString(fmt.Sprintf("\n[CQ:image,file=%s]\n名称:%s\n价格:%vyen\n商品id:%s",
 				item.ImageURL[0], item.ProductName, item.Price, item.ProductId))
 		}
 	}

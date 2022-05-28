@@ -16,7 +16,7 @@ func Boot() {
 	Push3to4Chan = make(chan utils.PushMsg, 10)
 	Push5upChan = make(chan utils.PushMsg, 10)
 
-	Pichubot.Listeners.OnGroupMsg = append(Pichubot.Listeners.OnGroupMsg, handlerGroupMsg)
+	Pichubot.Listeners.OnGroupMsg = append(Pichubot.Listeners.OnGroupMsg, handlerHelp, handlerGroupMsg)
 	Pichubot.Listeners.OnGroupRequest = append(Pichubot.Listeners.OnGroupRequest, handlerGroupRequest)
 	bot := Pichubot.NewBot()
 	bot.Config = Pichubot.Config{
