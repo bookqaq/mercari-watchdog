@@ -2,10 +2,10 @@ package webapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
-	"time"
 
 	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
 	"bookq.xyz/mercari-watchdog/datatype/analysistask"
@@ -15,9 +15,9 @@ import (
 )
 
 type fetchedSettingsReply struct {
-	expire   int64
-	settings fetchdata.FetchedSettings
-	override fetchdata.FetchOverride
+	Expire   int64                     `json:"expire"`
+	Settings fetchdata.FetchedSettings `json:"settings"`
+	Override fetchdata.FetchOverride   `json:"override"`
 }
 
 var config = struct {
@@ -56,23 +56,23 @@ func postTaskAddFetch(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, genericPostReply{
 			Status:  "failed",
-			Message: "没有查到用户数据，请确定从机器人处添加任务",
+			Message: fmt.Sprintf("没有查到用户数据，请确定从机器人处添加任务(%s)", err.Error()),
 			Auth:    auth,
 		})
 		return
 	}
 	c.JSON(http.StatusOK, struct {
-		status string
-		data   fetchedSettingsReply
-		auth   string
+		Status string               `json:"status"`
+		Data   fetchedSettingsReply `json:"data"`
+		Auth   string               `json:"auth"`
 	}{
-		status: "ok",
-		data: fetchedSettingsReply{
-			expire:   time.Now().Unix() + config.Expire,
-			settings: config.Settings,
-			override: data.Override,
+		Status: "ok",
+		Data: fetchedSettingsReply{
+			Expire:   data.Expire,
+			Settings: config.Settings,
+			Override: data.Override,
 		},
-		auth: data.Auth,
+		Auth: data.Auth,
 	})
 }
 

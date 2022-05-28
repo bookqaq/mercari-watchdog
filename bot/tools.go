@@ -61,6 +61,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	fetchData := fetchdata.TaskAddFetchData{
 		Override: fetchdata.FetchOverride{
 			Owner: qq,
+			Group: group,
 		},
 		Auth:   authkey,
 		Expire: time.Now().Unix() + int64(600),
@@ -70,7 +71,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	result = fmt.Sprintf("在这个页面里也可以添加任务:%s%s\n%s", merbot_tadd_link, authkey, result)
+	result = fmt.Sprintf("在这个页面里也可以添加任务:\n%s%s\n%s", merbot_tadd_link, authkey, result)
 	return result, nil
 }
 

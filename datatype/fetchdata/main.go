@@ -26,7 +26,7 @@ func GetOne(auth string) (TaskAddFetchData, error) {
 		return TaskAddFetchData{}, err
 	}
 	var result TaskAddFetchData
-	err := res.Decode(result)
+	err := res.Decode(&result)
 	if err != nil {
 		return TaskAddFetchData{}, err
 	}

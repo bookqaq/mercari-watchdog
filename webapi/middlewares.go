@@ -25,6 +25,7 @@ func tlsHandler() gin.HandlerFunc {
 
 func corsHandler() gin.HandlerFunc {
 	return cors.New(cors.Config{
+		AllowHeaders:     []string{"Content-Type", "Origin"},
 		AllowMethods:     []string{"POST"},
 		AllowCredentials: true,
 		AllowAllOrigins:  true,

@@ -15,4 +15,5 @@ type FetchedSettings struct {
 }
 type FetchOverride struct {
 	Owner int64 `json:"owner" bson:"owner"`
+	Group int64 `json:"group" bson:"group"`
 }
