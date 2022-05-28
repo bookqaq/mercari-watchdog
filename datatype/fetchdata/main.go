@@ -52,13 +52,11 @@ func Delete(auth string) bool {
 func ClearExpired() {
 	coll := database.DB.Collection("TaskAddFetch")
 	_, err := coll.DeleteMany(
-		context.TODO(),
-		bson.D{{
+		context.TODO(), bson.D{{
 			Key: "expire",
-			Value: bson.D{{
+			Value: bson.D{primitive.E{
 				Key:   "$lte",
-				Value: time.Now().Unix,
-			}}}},
+				Value: time.Now().Unix()}}}},
 	)
 	if err != nil && err != mongo.ErrNoDocuments {
 		panic(err)

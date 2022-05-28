@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 
 	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
 	"bookq.xyz/mercari-watchdog/datatype/analysistask"
@@ -24,7 +25,6 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	case len(params) == 0:
 		result = "格式:\n" + "蹲煤\n" +
 			"关键词:\n" + "目标价格:\n" + "搜索间隔:\n" + "搜索页数:\n" +
-			"注:关键词取消了上限，使用空格或中文逗号分割会进行相同处理，目标价格中最低价为负数时视为任意价格，搜索间隔目前只有10分钟和1小时，每搜索页中有30个结果\n" +
 			"以下是举例:\n" + "蹲煤\n" + "关键词:プロセカ グリッター缶バッジ\n" + "搜索间隔:1小时\n" + "目标价格:100，500\n" + "搜索页数:3"
 
 	case len(params) == 4:
@@ -62,7 +62,8 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 		Override: fetchdata.FetchOverride{
 			Owner: qq,
 		},
-		Auth: authkey,
+		Auth:   authkey,
+		Expire: time.Now().Unix() + 600,
 	}
 
 	err := fetchdata.Insert(fetchData)
