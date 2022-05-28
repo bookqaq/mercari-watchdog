@@ -53,9 +53,11 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 	}
 
 	var authkey string
-	authkey = strings.ReplaceAll(uuid.New().String(), "-", "")
+	tmp := strings.Split(uuid.New().String(), "-")[:2]
+	authkey = fmt.Sprintf("%s%s", tmp[0], tmp[1])
 	for fetchdata.IfExist(authkey) {
-		authkey = strings.ReplaceAll(uuid.New().String(), "-", "")
+		tmp := strings.Split(uuid.New().String(), "-")[:2]
+		authkey = fmt.Sprintf("%s%s", tmp[0], tmp[1])
 	}
 
 	fetchData := fetchdata.TaskAddFetchData{
