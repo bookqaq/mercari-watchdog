@@ -63,7 +63,7 @@ func createTask(params []string, qq int64, group int64) (string, error) {
 			Owner: qq,
 		},
 		Auth:   authkey,
-		Expire: time.Now().Unix() + 600,
+		Expire: time.Now().Unix() + int64(600),
 	}
 
 	err := fetchdata.Insert(fetchData)

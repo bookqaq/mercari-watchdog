@@ -56,7 +56,7 @@ func postTaskAddFetch(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, genericPostReply{
 			Status:  "failed",
-			Message: "没有用户数据，请确定从机器人处添加任务",
+			Message: "没有查到用户数据，请确定从机器人处添加任务",
 			Auth:    auth,
 		})
 		return
