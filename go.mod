@@ -45,3 +45,5 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
+
+replace github.com/bookqaq/mer-wrapper => ../mer-wrapper
