@@ -11,13 +11,13 @@ import (
 var Config = struct {
 	const_Kensaku     string
 	MinimumRuneLength int
+	MaximumRuneLength int
 	MinmumLineCount   int
-	MaximumLineCount  int
 }{
 	const_Kensaku:     "検索用",
 	MinimumRuneLength: 15,
+	MaximumRuneLength: 50,
 	MinmumLineCount:   10,
-	MaximumLineCount:  100,
 }
 
 func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {

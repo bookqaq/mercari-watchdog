@@ -6,10 +6,12 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
 	"bookq.xyz/mercari-watchdog/datatype/analysistask"
 	"bookq.xyz/mercari-watchdog/datatype/fetchdata"
+	"github.com/bookqaq/goForMercari/mercarigo"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -105,6 +107,13 @@ func postTaskAddSubmit(c *gin.Context) {
 		return
 	}
 
+	firstData, err := mercarigo.Mercari_search(parsed.Data.KeywordsOrig, "created_time", "desc", "on_sale", 30, parsed.Data.MaxPage)
+	if err != nil {
+		c.JSON(http.StatusOK, genericPostReply{
+			Status:  "failed",
+			Message: "服务器网络出问题了，请联系我告诉我这个问题",
+		})
+	}
 	var tid int32
 	tid = rand.Int31()
 	for analysistask.IfExist(tid) {
@@ -127,8 +136,9 @@ func postTaskAddSubmit(c *gin.Context) {
 		ID:       primitive.NewObjectID(),
 		Keywords: parsed.Data.Keywords,
 		TaskID:   tid,
-		Length:   0,
-		Data:     nil,
+		Time:     time.Now().Unix(),
+		Length:   len(firstData),
+		Data:     firstData,
 	}
 	err = analysisdata.Insert(adata)
 	if err != nil {
@@ -145,4 +155,6 @@ func postTaskAddSubmit(c *gin.Context) {
 		Status:  "success",
 		Message: "任务添加请求提交成功，结果请通过查询进行查看",
 	})
+
+	fetchdata.Delete(parsed.Auth)
 }

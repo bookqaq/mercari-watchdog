@@ -40,13 +40,11 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		word_mark = betKensaku(descrpition_arr)
 	}
 
-	if len(word_mark) <= 0 {
-		return true
-	}
-
-	for i := len(word_mark) - 1; i >= 0; i-- {
-		cutKnownKensaku(descrpition_arr, word_mark[i])
-		descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
+	if len(word_mark) > 0 {
+		for i := len(word_mark) - 1; i >= 0; i-- {
+			cutKnownKensaku(descrpition_arr, word_mark[i])
+			descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
+		}
 	}
 
 	for _, item := range keywords {
@@ -92,21 +90,21 @@ func getKnownKensaku(arr []string, start int) [2]int {
 }
 
 func betKensaku(arr []string) [][2]int {
-	mark_storage := make([][2]int, 0)
+	mark_storage := make([][2]int, 0, 2)
 	conlen := len(arr)
 
 	for i := 0; i < conlen; i++ {
 		var mark [2]int
-		if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumLineCount {
+		if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumRuneLength {
 			mark[0] = i
 			for i++; i < conlen; i++ {
-				if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumLineCount {
+				if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumRuneLength {
 					mark[1] = i
 				} else {
 					break
 				}
 			}
-			if mark[1]-mark[0] > Config.MinmumLineCount {
+			if mark[1]-mark[0] >= Config.MinmumLineCount {
 				mark_storage = append(mark_storage, mark)
 			}
 		}
