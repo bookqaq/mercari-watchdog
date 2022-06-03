@@ -6,9 +6,9 @@ import (
 
 	"bookq.xyz/mercari-watchdog/bot"
 	"bookq.xyz/mercari-watchdog/compare"
-	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
-	"bookq.xyz/mercari-watchdog/datatype/analysistask"
-	"bookq.xyz/mercari-watchdog/datatype/fetchdata"
+	"bookq.xyz/mercari-watchdog/models/analysisdata"
+	"bookq.xyz/mercari-watchdog/models/analysistask"
+	"bookq.xyz/mercari-watchdog/models/fetchdata"
 	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
@@ -22,6 +22,7 @@ const (
 var taskChans []chan analysistask.AnalysisTask
 
 func Boot() {
+	analysisdata.RenewAll()
 	go analysistask.AddTaskBuffer()
 	go fetchdata.TickClearExpired(120 * time.Second)
 

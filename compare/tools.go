@@ -40,20 +40,27 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		word_mark = betKensaku(descrpition_arr)
 	}
 
-	if len(word_mark) > 0 {
-		for i := len(word_mark) - 1; i >= 0; i-- {
-			cutKnownKensaku(descrpition_arr, word_mark[i])
-			descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
-		}
+	if len(word_mark) <= 0 {
+		return true
 	}
 
+	for i := len(word_mark) - 1; i >= 0; i-- {
+		cutKnownKensaku(descrpition_arr, word_mark[i])
+		descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
+	}
+
+	contain_count := 0
 	for _, item := range keywords {
-		if !strings.Contains(title, item) {
-			return false
+		if strings.Contains(title, item) {
+			contain_count++
 		}
 	}
 
-	return true
+	if float32(contain_count)/float32(len(keywords)) >= Config.V2KeywordMatchMin {
+		return true
+	}
+
+	return false
 }
 
 // Replace rune to new in s if rune in old

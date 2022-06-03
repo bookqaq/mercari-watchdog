@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"bookq.xyz/mercari-watchdog/datatype/analysisdata"
-	"bookq.xyz/mercari-watchdog/datatype/analysistask"
-	"bookq.xyz/mercari-watchdog/datatype/fetchdata"
+	"bookq.xyz/mercari-watchdog/models/analysisdata"
+	"bookq.xyz/mercari-watchdog/models/analysistask"
+	"bookq.xyz/mercari-watchdog/models/fetchdata"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"

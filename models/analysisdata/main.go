@@ -3,6 +3,8 @@ package analysisdata
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
 	"bookq.xyz/mercari-watchdog/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -47,4 +49,14 @@ func Delete(taskID int32) error {
 		return fmt.Errorf("未找到可删除的历史数据")
 	}
 	return nil
+}
+
+func RenewAll() {
+	coll := database.DB.Collection("AnalysisData")
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "time", Value: time.Now().Unix()}}}}
+	res, err := coll.UpdateMany(context.TODO(), bson.D{{}}, update)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Found %d, Renew %d AnalysisDatas to current time\n", res.MatchedCount, res.ModifiedCount)
 }
