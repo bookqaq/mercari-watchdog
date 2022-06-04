@@ -96,7 +96,14 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
-	result, err := compare.Run3(data, recentItems, task)
+	var result []mercarigo.MercariItem
+
+	if len(task.MustMatch) <= 0 {
+		result, err = compare.Run2(data, recentItems, task)
+	} else {
+		result, err = compare.Run3(data, recentItems, task)
+	}
+
 	if err != nil {
 		fmt.Printf("failed to compare, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return

@@ -9,6 +9,7 @@ import (
 )
 
 func Boot() {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.Use(corsHandler())
 	getAllRouters(router)
