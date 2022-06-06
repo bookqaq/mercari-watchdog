@@ -79,7 +79,7 @@ func runWorkflow(interval int, t time.Time) {
 	}
 
 	for i, taskItem := range taskResults {
-		taskChans[i%5] <- taskItem
+		taskChans[i%TaskRoutines] <- taskItem
 	}
 }
 
