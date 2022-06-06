@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"bookq.xyz/mercariWatchdog/bot"
-	"bookq.xyz/mercariWatchdog/compare"
-	"bookq.xyz/mercariWatchdog/utils"
+	"bookq.xyz/mercari-watchdog/bot"
+	"bookq.xyz/mercari-watchdog/compare"
+	"bookq.xyz/mercari-watchdog/models/analysisdata"
+	"bookq.xyz/mercari-watchdog/models/analysistask"
+	"bookq.xyz/mercari-watchdog/models/fetchdata"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
 	"github.com/google/uuid"
@@ -16,46 +19,44 @@ const (
 	TaskRoutines = 5
 )
 
-var taskChans []chan utils.AnalysisTask
+var taskChans []chan analysistask.AnalysisTask
 
 func Boot() {
-	utils.Init()
+	analysisdata.RenewAll()
+	go analysistask.AddTaskBuffer()
+	go fetchdata.TickClearExpired(120 * time.Second)
 
-	debug_ticker := time.NewTicker(18400 * time.Second)
 	ticker_10m := time.NewTicker(600 * time.Second)
+	ticker_1h := time.NewTicker(3600 * time.Second)
+	ticker_5m := time.NewTicker(300 * time.Second)
+	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
 
-	taskChans = make([]chan utils.AnalysisTask, TaskRoutines)
+	taskChans = make([]chan analysistask.AnalysisTask, TaskRoutines)
 	for i := 0; i < TaskRoutines; i++ {
-		taskChans[i] = make(chan utils.AnalysisTask, 5)
+		taskChans[i] = make(chan analysistask.AnalysisTask, 5)
 		go taskChanListener(taskChans[i])
 	}
 
-	tickCounter := 0
-	maxCounter := false
-
+	// Run tasks when Ticker tick.
 	for {
 		select {
+		case t := <-ticker_1h.C:
+			go runWorkflow(3600, t)
 		case t := <-ticker_10m.C:
-			tickCounter++
 			go runWorkflow(600, t)
-			if 1 <= (tickCounter / 6) {
-				go runWorkflow(3600, t)
-				maxCounter = true
-			}
-			if maxCounter {
-				tickCounter = 0
-				maxCounter = false
-			}
-		case t := <-debug_ticker.C:
-			fmt.Printf("占位计时器. %v\n", t.Unix())
+		case t := <-ticker_5m.C:
+			go runWorkflow(300, t)
+		case <-ticker_clearExpiredFetch.C:
+			go fetchdata.ClearExpired()
 		}
 	}
 }
 
-func taskChanListener(taskInput <-chan utils.AnalysisTask) {
+func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	for {
 		task := <-taskInput
 		runTask(time.Now(), task)
+		time.Sleep(6 * time.Second)
 	}
 }
 
@@ -71,35 +72,47 @@ func runWorkflow(interval int, t time.Time) {
 	//}
 
 	merwrapper.Client.ClientID = uuid.NewString()
-	taskResults, err := utils.GetAllTasks(interval)
+	taskResults, err := analysistask.GetAll(interval)
 	if err != nil {
 		fmt.Printf("error during processing workflow %s : %v", t, interval)
 		return
 	}
 
 	for i, taskItem := range taskResults {
-		taskChans[i%5] <- taskItem
+		taskChans[i%TaskRoutines] <- taskItem
 	}
 }
 
-func runTask(t time.Time, task utils.AnalysisTask) {
+func runTask(t time.Time, task analysistask.AnalysisTask) {
 	//fmt.Printf("debug: task %v run\n", task.TaskID)
-	data, err := mercarigo.Mercari_search(utils.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
+	data, err := mercarigo.Mercari_search(tools.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
 	}
 
-	recentItems, err := utils.GetDataDB(task.TaskID)
+	recentItems, err := analysisdata.GetOne(task.TaskID)
 	if err != nil {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
-	result, err := compare.Run2(data, recentItems, task)
+	var result []mercarigo.MercariItem
+
+	if len(task.MustMatch) <= 0 {
+		result, err = compare.Run2(data, recentItems, task)
+	} else {
+		result, err = compare.Run3(data, recentItems, task)
+	}
+
 	if err != nil {
 		fmt.Printf("failed to compare, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
+
+	//if !reflect.DeepEqual(recentItems.Keywords, task.Keywords) {
+	//	fmt.Printf("Found keyword error in %d, %v -> %v", recentItems.TaskID, task.Keywords, recentItems.Keywords)
+	//	recentItems.Keywords = task.Keywords
+	//}
 
 	recentItems.Data = result
 	recentItems.Time = time.Now().Unix()
@@ -107,7 +120,7 @@ func runTask(t time.Time, task utils.AnalysisTask) {
 
 	go bot.MercariPushMsg(recentItems, task.Owner, task.Group)
 
-	err = utils.UpdateDataDB(recentItems)
+	err = analysisdata.Update(recentItems)
 	if err != nil {
 		fmt.Printf("failed to update AnalysisData, taskID %v, time %v, %s", recentItems.TaskID, t.Unix(), err)
 		return

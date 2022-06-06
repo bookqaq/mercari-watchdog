@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"bookq.xyz/mercariWatchdog/utils"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 )
 
@@ -19,16 +19,17 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 	return i
 }
 
+// format item description and process
 func compDescriptionFilter(keywords []string, title string, description string) bool {
 	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
-	del_count := utils.DeleteInvalidItem(descrpition_arr, "")
+	del_count := tools.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
 	var word_mark [][2]int
 	for i, item := range descrpition_arr {
-		if strings.Contains(item, Config.const_V2Kensaku) {
+		if strings.Contains(item, Config.const_Kensaku) {
 			tmp := getKnownKensaku(descrpition_arr, i)
-			if len(tmp) >= Config.V2MinmumLineCount {
+			if len(tmp) >= Config.MinmumLineCount {
 				word_mark = append(word_mark, tmp)
 			}
 			break
@@ -62,6 +63,8 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 	return false
 }
 
+// Replace rune to new in s if rune in old
+// TODO: Change old to map[rune]struct{}
 func StringMultipleReplacer(s string, old []rune, new rune) string {
 	r := []rune(s)
 	for i, v := range r {
@@ -85,7 +88,7 @@ func getKnownKensaku(arr []string, start int) [2]int {
 	var mark [2]int
 	mark[0] = start
 	for i := start; i < len(arr); i++ {
-		if linelen := utf8.RuneCount([]byte(arr[i])); linelen <= 0 || linelen > Config.V2MinimumRuneLength {
+		if linelen := utf8.RuneCount([]byte(arr[i])); linelen <= 0 || linelen > Config.MinimumRuneLength {
 			break
 		}
 		mark[1] = i
@@ -94,21 +97,21 @@ func getKnownKensaku(arr []string, start int) [2]int {
 }
 
 func betKensaku(arr []string) [][2]int {
-	mark_storage := make([][2]int, 0)
+	mark_storage := make([][2]int, 0, 2)
 	conlen := len(arr)
 
 	for i := 0; i < conlen; i++ {
 		var mark [2]int
-		if linelen := utf8.RuneCount([]byte(arr[i])); linelen > 0 && linelen < Config.V2MinimumRuneLength {
+		if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumRuneLength {
 			mark[0] = i
 			for i++; i < conlen; i++ {
-				if linelen := utf8.RuneCount([]byte(arr[i])); linelen > 0 && linelen < Config.V2MinimumRuneLength {
+				if linelen := utf8.RuneCount([]byte(arr[i])); (linelen > 0 && linelen < Config.MinimumRuneLength) || linelen > Config.MaximumRuneLength {
 					mark[1] = i
 				} else {
 					break
 				}
 			}
-			if mark[1]-mark[0] > Config.V2MinmumLineCount {
+			if mark[1]-mark[0] >= Config.MinmumLineCount {
 				mark_storage = append(mark_storage, mark)
 			}
 		}

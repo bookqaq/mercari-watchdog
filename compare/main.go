@@ -1,54 +1,36 @@
 package compare
 
 import (
-	"fmt"
+	"strings"
 
-	"bookq.xyz/mercariWatchdog/utils"
+	"bookq.xyz/mercari-watchdog/models/analysisdata"
+	"bookq.xyz/mercari-watchdog/models/analysistask"
+	"bookq.xyz/mercari-watchdog/tools"
 	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
 )
 
 var Config = struct {
-	const_V2Kensaku     string
-	V2MinimumRuneLength int
-	V2MinmumLineCount   int
-	V2KeywordMatchMin   float32
+	const_Kensaku     string
+	MinimumRuneLength int
+	MaximumRuneLength int
+	MinmumLineCount   int
+	V2KeywordMatchMin float32
 }{
-	const_V2Kensaku:     "検索用",
-	V2MinimumRuneLength: 15,
-	V2MinmumLineCount:   10,
-	V2KeywordMatchMin:   0.4,
+	const_Kensaku:     "検索用",
+	MinimumRuneLength: 15,
+	MaximumRuneLength: 50,
+	MinmumLineCount:   10,
+	V2KeywordMatchMin: 0.4,
 }
 
-// implement compare, updated methods would be available in future
-func Run(data []mercarigo.MercariItem, recentData utils.AnalysisData, task utils.AnalysisTask) ([]mercarigo.MercariItem, error) {
-	data = utils.KeywordFilter(task, data)
-
-	i, itemlen, uptime := 0, len(data), recentData.Time
-	for _, item := range data {
-		if item.Updated < uptime {
-			break
-		}
-		i++
-	}
-	if i >= itemlen {
-		return nil, fmt.Errorf("items compare fail, no item update")
-	}
-
-	data = data[:i]
-
-	data = utils.PriceFilter(task, data)
-
-	return data, nil
-}
-
-func Run2(data []mercarigo.MercariItem, recentData utils.AnalysisData, task utils.AnalysisTask) ([]mercarigo.MercariItem, error) {
+func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
 	uptime := recentData.Time
 
 	i := compNewTimestamp(data, uptime)
 
 	data = data[:i]
-	data = utils.PriceFilter(task, data)
+	data = tools.PriceFilter(task.TargetPrice, data)
 
 	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
 	for _, item := range data {
@@ -57,6 +39,31 @@ func Run2(data []mercarigo.MercariItem, recentData utils.AnalysisData, task util
 			return nil, err
 		}
 		if compDescriptionFilter(task.Keywords, item.ProductName, desc.Description) {
+			fdata = append(fdata, item)
+		}
+	}
+	return fdata, nil
+}
+
+func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
+	uptime := recentData.Time
+
+	i := compNewTimestamp(data, uptime)
+
+	data = data[:i]
+	data = tools.PriceFilter(task.TargetPrice, data)
+
+	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
+
+	for _, item := range data {
+		contain_flag := true
+		for _, kw := range task.MustMatch {
+			if !strings.Contains(item.ProductName, kw) {
+				contain_flag = false
+				break
+			}
+		}
+		if contain_flag {
 			fdata = append(fdata, item)
 		}
 	}
