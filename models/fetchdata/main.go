@@ -62,11 +62,3 @@ func ClearExpired() {
 		panic(err)
 	}
 }
-
-func TickClearExpired(d time.Duration) {
-	t := time.Tick(d)
-	for {
-		<-t
-		ClearExpired()
-	}
-}

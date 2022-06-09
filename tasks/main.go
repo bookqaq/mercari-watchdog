@@ -24,7 +24,6 @@ var taskChans []chan analysistask.AnalysisTask
 func Boot() {
 	analysisdata.RenewAll()
 	go analysistask.AddTaskBuffer()
-	go fetchdata.TickClearExpired(120 * time.Second)
 
 	ticker_10m := time.NewTicker(600 * time.Second)
 	ticker_1h := time.NewTicker(3600 * time.Second)
