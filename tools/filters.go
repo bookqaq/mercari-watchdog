@@ -1,11 +1,28 @@
 package tools
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 
+	"bookq.xyz/mercari-watchdog/models/blacklist"
 	"github.com/bookqaq/goForMercari/mercarigo"
 )
+
+var blockedSellers map[int64]struct{}
+
+func RefreshBlockedSellers() {
+	res, err := blacklist.BlockedSellerGetAll()
+	if err != nil {
+		panic(err)
+	}
+
+	blockMap_tmp := make(map[int64]struct{}, len(res))
+	for _, seller := range res {
+		blockMap_tmp[seller.UserID] = struct{}{}
+	}
+	blockedSellers = blockMap_tmp
+}
 
 // filters
 // Return items that match task.Keywords
@@ -33,6 +50,21 @@ func PriceFilter(price [2]int, data []mercarigo.MercariItem) []mercarigo.Mercari
 		}
 	} else {
 		return data
+	}
+	return result
+}
+
+func BlockedSellerFilter(data []mercarigo.MercariItem) []mercarigo.MercariItem {
+	if blockedSellers == nil {
+		panic(errors.New("BlockedSeller Must be a map, not nil"))
+	}
+
+	result := make([]mercarigo.MercariItem, 0, len(data))
+
+	for _, item := range data {
+		if _, ok := blockedSellers[item.Seller.Id]; ok {
+			result = append(result, item)
+		}
 	}
 	return result
 }

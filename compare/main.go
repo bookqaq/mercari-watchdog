@@ -52,6 +52,7 @@ func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, ta
 
 	data = data[:i]
 	data = tools.PriceFilter(task.TargetPrice, data)
+	data = tools.BlockedSellerFilter(data)
 
 	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
 
