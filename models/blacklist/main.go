@@ -10,7 +10,7 @@ import (
 func BlockedSellerGetAll() ([]BlockedSeller, error) {
 	coll := database.DB.Collection("BlackList")
 	var result []BlockedSeller
-	cursor, err := coll.Find(context.TODO(), bson.D{})
+	cursor, err := coll.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return nil, err
 	}

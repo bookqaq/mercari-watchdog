@@ -24,7 +24,7 @@ func Connect() {
 		fmt.Printf("Connect to database fail.\n%s", err)
 		os.Exit(-1)
 	}
-	db := client.Database("mercariWatchdogDatabase")
+	db := client.Database("merbotV3DB")
 
 	DB = db
 }

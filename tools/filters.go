@@ -60,9 +60,8 @@ func BlockedSellerFilter(data []mercarigo.MercariItem) []mercarigo.MercariItem {
 	}
 
 	result := make([]mercarigo.MercariItem, 0, len(data))
-
 	for _, item := range data {
-		if _, ok := blockedSellers[item.Seller.Id]; ok {
+		if _, ok := blockedSellers[item.Seller.Id]; !ok {
 			result = append(result, item)
 		}
 	}

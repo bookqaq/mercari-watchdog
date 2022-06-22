@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	TaskRoutines = 5
+	TaskRoutines   = 5
+	TaskTickerTime = 5 * time.Second
 )
 
 var taskChans []chan analysistask.AnalysisTask
@@ -52,10 +53,11 @@ func Boot() {
 }
 
 func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
+	ticker := time.NewTicker(TaskTickerTime)
 	for {
 		task := <-taskInput
 		runTask(time.Now(), task)
-		time.Sleep(6 * time.Second)
+		<-ticker.C
 	}
 }
 
