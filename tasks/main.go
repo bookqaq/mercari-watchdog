@@ -39,6 +39,7 @@ func Boot() {
 
 	// Run tasks when Ticker tick.
 	for {
+		tools.RefreshBlockedSellers()
 		select {
 		case t := <-ticker_1h.C:
 			go runWorkflow(3600, t)
