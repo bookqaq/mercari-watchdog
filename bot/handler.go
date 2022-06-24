@@ -18,7 +18,7 @@ var TIME_1H_STRING = []string{"1时", "1小时", "一小时", "60分", "3600秒"
 
 func handlerHelp(e Pichubot.MessageGroup) {
 	if strings.EqualFold(e.Message, "/help") || strings.EqualFold(e.Message, ".help") ||
-		strings.EqualFold(e.Message, "/帮助") || strings.EqualFold(e.Message, "帮助") {
+		strings.EqualFold(e.Message, "/帮助") {
 		Pichubot.SendGroupMsg("指令:\n蹲煤:添加蹲煤任务\n查询:查询自己添加的任务\n删除<任务id>:删除指定id的蹲煤任务", e.GroupID)
 	}
 }
