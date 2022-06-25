@@ -22,6 +22,7 @@ type fetchedSettingsReply struct {
 	Override fetchdata.FetchOverride   `json:"override"`
 }
 
+// static configs about tasks
 var config = struct {
 	Settings fetchdata.FetchedSettings
 	Expire   int64
@@ -37,6 +38,7 @@ var config = struct {
 	Expire: 600,
 }
 
+// route group about bot's api
 func getAllRouters(router *gin.Engine) {
 	tasks := router.Group("/task")
 	{
@@ -45,6 +47,7 @@ func getAllRouters(router *gin.Engine) {
 	}
 }
 
+// validate auth and return bot settings and user data
 func postTaskAddFetch(c *gin.Context) {
 	auth := c.PostForm("auth")
 	if auth == "" {
@@ -78,6 +81,7 @@ func postTaskAddFetch(c *gin.Context) {
 	})
 }
 
+// parse form and add task
 func postTaskAddSubmit(c *gin.Context) {
 	data, err := c.GetRawData()
 	if err != nil {
@@ -107,6 +111,7 @@ func postTaskAddSubmit(c *gin.Context) {
 		return
 	}
 
+	// AnalysisData should be filled with some search result before insertion
 	firstData, err := mercarigo.Mercari_search(parsed.Data.KeywordsOrig, "created_time", "desc", "on_sale", 30, parsed.Data.MaxPage)
 	if err != nil {
 		c.JSON(http.StatusOK, genericPostReply{
@@ -145,7 +150,7 @@ func postTaskAddSubmit(c *gin.Context) {
 		log.Println(err)
 		c.JSON(http.StatusOK, genericPostReply{
 			Status:  "failed",
-			Message: "数据添加程序出现问题，请联系我",
+			Message: "数据添加出现问题，请联系我告诉我这个问题",
 		})
 		return
 	}
@@ -156,5 +161,6 @@ func postTaskAddSubmit(c *gin.Context) {
 		Message: "任务添加请求提交成功，结果请通过查询进行查看",
 	})
 
+	// delete fetchdata after success
 	fetchdata.Delete(parsed.Auth)
 }

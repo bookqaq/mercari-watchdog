@@ -49,6 +49,7 @@ func Delete(auth string) bool {
 	return true
 }
 
+// remove documents that expired
 func ClearExpired() {
 	coll := database.DB.Collection("TaskAddFetch")
 	_, err := coll.DeleteMany(

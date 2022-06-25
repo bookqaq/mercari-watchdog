@@ -19,12 +19,14 @@ func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
 	return i
 }
 
-// format item description and process
+// service: format item description and judge
 func compDescriptionFilter(keywords []string, title string, description string) bool {
+	// loads of runes used by yhm to split lines/words and split those into array
 	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
 	del_count := tools.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
+	// get position of "検索用"
 	var word_mark [][2]int
 	for i, item := range descrpition_arr {
 		if strings.Contains(item, Config.const_Kensaku) {
@@ -36,19 +38,23 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		}
 	}
 
+	// bet kensaku in description
 	if len(word_mark) <= 0 {
 		word_mark = betKensaku(descrpition_arr)
 	}
 
+	// allow item that find no kensaku words
 	if len(word_mark) <= 0 {
 		return true
 	}
 
+	// delete words if exists
 	for i := len(word_mark) - 1; i >= 0; i-- {
 		cutKnownKensaku(descrpition_arr, word_mark[i])
 		descrpition_arr = descrpition_arr[:len(descrpition_arr)-(word_mark[i][1]-word_mark[i][0])]
 	}
 
+	// calculate percentage of keyword contains
 	contain_count := 0
 	for _, item := range keywords {
 		if strings.Contains(title, item) {
@@ -56,15 +62,12 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 		}
 	}
 
-	if float32(contain_count)/float32(len(keywords)) >= Config.V2KeywordMatchMin {
-		return true
-	}
-
-	return false
+	// simplify judges about return value (forced by gopls)
+	return float32(contain_count)/float32(len(keywords)) >= Config.V2KeywordMatchMin
 }
 
 // Replace rune to new in s if rune in old
-// TODO: Change old to map[rune]struct{}
+// TODO: Change old to map[rune]struct{} for a faster find speed
 func StringMultipleReplacer(s string, old []rune, new rune) string {
 	r := []rune(s)
 	for i, v := range r {
@@ -78,12 +81,14 @@ func StringMultipleReplacer(s string, old []rune, new rune) string {
 	return string(r)
 }
 
+// move words that after kensaku words forward, need to slice manually
 func cutKnownKensaku(arr []string, pos [2]int) {
 	for i, j := pos[0], pos[1]; i < pos[1] && j < len(arr); i, j = i+1, j+1 {
 		arr[i] = arr[j]
 	}
 }
 
+// find kensaku after start
 func getKnownKensaku(arr []string, start int) [2]int {
 	var mark [2]int
 	mark[0] = start
@@ -96,6 +101,7 @@ func getKnownKensaku(arr []string, start int) [2]int {
 	return mark
 }
 
+// bet the start position of kensaku and find its end
 func betKensaku(arr []string) [][2]int {
 	mark_storage := make([][2]int, 0, 2)
 	conlen := len(arr)

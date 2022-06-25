@@ -16,6 +16,7 @@ import (
 
 var TIME_1H_STRING = []string{"1时", "1小时", "一小时", "60分", "3600秒"}
 
+// group: help command handler
 func handlerHelp(e Pichubot.MessageGroup) {
 	if strings.EqualFold(e.Message, "/help") || strings.EqualFold(e.Message, ".help") ||
 		strings.EqualFold(e.Message, "/帮助") {
@@ -23,6 +24,7 @@ func handlerHelp(e Pichubot.MessageGroup) {
 	}
 }
 
+// group: all other commands' handler
 func handlerGroupMsg(e Pichubot.MessageGroup) {
 	msgarr := strings.Split(e.RawMessage, "\n")
 	for i := 0; i < len(msgarr); i++ {
@@ -80,7 +82,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 	}
 }
 
-// Accept Group invite that in collection GroupWhitelist
+// Accept Group invite that in collection GroupSettings
 func handlerGroupRequest(r Pichubot.GroupRequest) {
 	res, err := group.FindWhitelist(r.GroupId)
 	if err != nil || !res {
@@ -112,7 +114,7 @@ func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 
 // Push channel with priority
 func msgPushService() {
-	tick := time.Tick(3 * time.Second)
+	tick := time.NewTicker(3 * time.Second)
 	for {
 		select {
 		case push := <-OperationChan:
@@ -145,10 +147,11 @@ func msgPushService() {
 				}
 			}
 		}
-		<-tick
+		<-tick.C
 	}
 }
 
+// the only function to send tools.PushMsg
 func pushCore(push tools.PushMsg) {
 	for _, item := range push.S {
 		Pichubot.SendGroupMsg(item, push.Dst)

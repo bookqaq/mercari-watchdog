@@ -15,10 +15,11 @@ type AnalysisData struct {
 	Keywords []string                `bson:"keyword"`
 	TaskID   int32                   `bson:"taskID"` // a primary-key-alike value
 	Time     int64                   `bson:"time"`   // unix time
-	Length   int                     `bson:"length"` // data amount in total
+	Length   int                     `bson:"length"` // length of data
 	Data     []mercarigo.MercariItem `bson:"data"`
 }
 
+// privleged one display items in mulitple messages
 func (d *AnalysisData) PrivlegedFormatSimplifiedChinese() []string {
 	location, _ := time.LoadLocation("Asia/Shanghai")
 	res := make([]string, 1, 6)
@@ -36,6 +37,7 @@ func (d *AnalysisData) PrivlegedFormatSimplifiedChinese() []string {
 	return res
 }
 
+// normal one display items in one message
 func (d *AnalysisData) FormatSimplifiedChinese() string {
 	location, _ := time.LoadLocation("Asia/Shanghai")
 	var builder strings.Builder

@@ -13,7 +13,6 @@ import (
 var DB *mongo.Database
 
 func Connect() {
-
 	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017/?readPreference=primary&ssl=false")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 

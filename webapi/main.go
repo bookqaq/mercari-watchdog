@@ -11,7 +11,10 @@ import (
 func Boot() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
+
+	// middlewares to expand api's functions
 	router.Use(corsHandler())
+
 	getAllRouters(router)
 
 	srv := &http.Server{

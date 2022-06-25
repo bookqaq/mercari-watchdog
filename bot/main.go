@@ -11,13 +11,17 @@ var Push3to4Chan chan tools.PushMsg
 var Push5upChan chan tools.PushMsg
 
 func Boot() {
+	// init message chanwith Priority
 	OperationChan = make(chan tools.PushMsg, 10)
 	Push1to2Chan = make(chan tools.PushMsg, 10)
 	Push3to4Chan = make(chan tools.PushMsg, 10)
 	Push5upChan = make(chan tools.PushMsg, 10)
 
+	// add listeners
 	Pichubot.Listeners.OnGroupMsg = append(Pichubot.Listeners.OnGroupMsg, handlerHelp, handlerGroupMsg)
 	Pichubot.Listeners.OnGroupRequest = append(Pichubot.Listeners.OnGroupRequest, handlerGroupRequest)
+
+	// config connection
 	bot := Pichubot.NewBot()
 	bot.Config = Pichubot.Config{
 		Loglvl:   Pichubot.LOGGER_LEVEL_WARNING,

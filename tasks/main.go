@@ -26,11 +26,13 @@ func Boot() {
 	analysisdata.RenewAll()
 	go analysistask.AddTaskBuffer()
 
+	// create tickers for time-based tasks
 	ticker_10m := time.NewTicker(600 * time.Second)
 	ticker_1h := time.NewTicker(3600 * time.Second)
 	ticker_5m := time.NewTicker(300 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
 
+	// manage all workers in an array
 	taskChans = make([]chan analysistask.AnalysisTask, TaskRoutines)
 	for i := 0; i < TaskRoutines; i++ {
 		taskChans[i] = make(chan analysistask.AnalysisTask, 5)
@@ -53,6 +55,7 @@ func Boot() {
 	}
 }
 
+// tasks worker, excute tasks processing every tasks.TaskTickTime
 func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	ticker := time.NewTicker(TaskTickerTime)
 	for {
@@ -62,7 +65,10 @@ func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	}
 }
 
+//
 func runWorkflow(interval int, t time.Time) {
+	//	for dev locally
+
 	//proxyUrl := "http://127.0.0.1:12355"
 	//proxy, _ := url.Parse(proxyUrl)
 	//tr := &http.Transport{
@@ -80,6 +86,7 @@ func runWorkflow(interval int, t time.Time) {
 		return
 	}
 
+	// TODO: convert taskChans to link list with loop
 	for i, taskItem := range taskResults {
 		taskChans[i%TaskRoutines] <- taskItem
 	}
@@ -87,12 +94,15 @@ func runWorkflow(interval int, t time.Time) {
 
 func runTask(t time.Time, task analysistask.AnalysisTask) {
 	//fmt.Printf("debug: task %v run\n", task.TaskID)
+
+	// fetch items data from mercari
 	data, err := mercarigo.Mercari_search(tools.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
 	}
 
+	// get AnalysisData to generate message
 	recentItems, err := analysisdata.GetOne(task.TaskID)
 	if err != nil {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
@@ -100,6 +110,7 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 	}
 	var result []mercarigo.MercariItem
 
+	// mainly v3, implement compatability about v2
 	if len(task.MustMatch) <= 0 {
 		result, err = compare.Run2(data, recentItems, task)
 	} else {
@@ -111,11 +122,7 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 		return
 	}
 
-	//if !reflect.DeepEqual(recentItems.Keywords, task.Keywords) {
-	//	fmt.Printf("Found keyword error in %d, %v -> %v", recentItems.TaskID, task.Keywords, recentItems.Keywords)
-	//	recentItems.Keywords = task.Keywords
-	//}
-
+	// update AnalysisData for expansion
 	recentItems.Data = result
 	recentItems.Time = time.Now().Unix()
 	recentItems.Length = len(result)

@@ -51,6 +51,7 @@ func Delete(taskID int32) error {
 	return nil
 }
 
+// Refresh data.Time to time.Now().Unix() for newest result
 func RenewAll() {
 	coll := database.DB.Collection("AnalysisData")
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "time", Value: time.Now().Unix()}}}}

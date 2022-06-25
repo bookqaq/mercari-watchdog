@@ -68,6 +68,7 @@ func Delete(taskID int32, qq int64) error {
 
 // Cache and insert.
 
+// implement debounce when inserting tasks
 func AddTaskBuffer() {
 	debounced := debounce.New(2 * time.Second)
 	for {
@@ -77,6 +78,7 @@ func AddTaskBuffer() {
 	}
 }
 
+// add multiple tasks in buffer by coll.InsertMany
 func addTasks() {
 	lock.Lock()
 	data := make([]interface{}, len(tasksToAdd))

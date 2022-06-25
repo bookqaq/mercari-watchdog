@@ -24,6 +24,7 @@ var Config = struct {
 	V2KeywordMatchMin: 0.4,
 }
 
+// Legacy compare method that use keyword-match threshold
 func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
 	uptime := recentData.Time
 
@@ -46,6 +47,7 @@ func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, ta
 	return fdata, nil
 }
 
+// CompareV3 compare method, math exactly in task.MustMatch
 func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
 	uptime := recentData.Time
 

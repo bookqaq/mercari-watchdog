@@ -11,6 +11,7 @@ import (
 
 var blockedSellers map[int64]struct{}
 
+//
 func RefreshBlockedSellers() {
 	res, err := blacklist.BlockedSellerGetAll()
 	if err != nil {
@@ -54,6 +55,7 @@ func PriceFilter(price [2]int, data []mercarigo.MercariItem) []mercarigo.Mercari
 	return result
 }
 
+// return items that seller not in blacklist
 func BlockedSellerFilter(data []mercarigo.MercariItem) []mercarigo.MercariItem {
 	if blockedSellers == nil {
 		panic(errors.New("BlockedSeller Must be a map, not nil"))
