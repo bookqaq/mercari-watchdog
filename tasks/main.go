@@ -30,8 +30,8 @@ func Boot() {
 	go analysistask.AddTaskBuffer()
 
 	// create tickers for time-based tasks
-	ticker_10m := time.NewTicker(300 * time.Second)
-	ticker_1h := time.NewTicker(3600 * time.Second)
+	ticker_10m := time.NewTicker(60 * time.Second)
+	ticker_1h := time.NewTicker(1800 * time.Second)
 	ticker_5m := time.NewTicker(60 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
 
@@ -81,8 +81,10 @@ func runWorkflow(interval int, t time.Time) {
 	//	Transport: tr,
 	//}
 
-	common.Client.ClientID = uuid.NewString()
 	common.Client.Content = http.DefaultClient
+
+	common.Client.ClientID = uuid.NewString()
+
 	taskResults, err := analysistask.GetAll(interval)
 	if err != nil {
 		fmt.Printf("error during processing workflow %s : %v", t, interval)
