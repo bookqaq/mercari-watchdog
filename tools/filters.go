@@ -70,7 +70,7 @@ func BlockedSellerFilter(data []mercarigo.MercariItem) []mercarigo.MercariItem {
 	return result
 }
 
-// Delete item in ordered array src that return true in reflect.DeepEqual(item, value), return lenght deleted
+// Delete item in ordered array src that filter when reflect.DeepEqual(item, value) != true, return lenght deleted
 func DeleteInvalidItem[T any](src []T, value T) int {
 	deleted, formerpt, length := 0, 0, len(src)
 	for i := 0; i < length; i++ {

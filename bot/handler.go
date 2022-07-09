@@ -53,7 +53,7 @@ func handlerGroupMsg(e Pichubot.MessageGroup) {
 		}
 		OperationChan <- tools.PushMsg{Dst: e.GroupID, S: []string{msgbuilder.String()}}
 	case strings.Index(msgarr[0], "删除") == 0:
-		tmp := strings.Trim(msgarr[0], "删除")
+		tmp := strings.Trim(strings.Trim(msgarr[0], "删除"), " ")
 		msgarr = strings.Split(tmp, " ")
 		idarr := make([]int32, len(msgarr))
 		for i, item := range msgarr {
