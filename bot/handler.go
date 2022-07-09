@@ -114,7 +114,7 @@ func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 
 // Push channel with priority
 func msgPushService() {
-	tick := time.NewTicker(3 * time.Second)
+	tick := time.NewTicker(300 * time.Millisecond)
 	for {
 		select {
 		case push := <-OperationChan:
