@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"bookq.xyz/mercari-watchdog/models/blacklist"
-	"github.com/bookqaq/goForMercari/mercarigo"
+	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 )
 
 var blockedSellers map[int64]struct{}
@@ -27,9 +27,9 @@ func RefreshBlockedSellers() {
 
 // filters
 // Return items that match task.Keywords
-func KeywordFilter(keywords []string, data []mercarigo.MercariItem) []mercarigo.MercariItem {
+func KeywordFilter(keywords []string, data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
 	for _, keyword := range keywords {
-		tmp := make([]mercarigo.MercariItem, 0, len(data))
+		tmp := make([]wrapperv1.MercariItem, 0, len(data))
 		for _, item := range data {
 			if strings.Contains(item.ProductName, keyword) {
 				tmp = append(tmp, item)
@@ -41,8 +41,8 @@ func KeywordFilter(keywords []string, data []mercarigo.MercariItem) []mercarigo.
 }
 
 // Return items that price in task.TargetPrice
-func PriceFilter(price [2]int, data []mercarigo.MercariItem) []mercarigo.MercariItem {
-	result := make([]mercarigo.MercariItem, 0, len(data))
+func PriceFilter(price [2]int, data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
+	result := make([]wrapperv1.MercariItem, 0, len(data))
 	if price[0] >= 0 && price[1] >= price[0] {
 		for _, item := range data {
 			if item.Price >= price[0] && item.Price <= price[1] {
@@ -56,12 +56,12 @@ func PriceFilter(price [2]int, data []mercarigo.MercariItem) []mercarigo.Mercari
 }
 
 // return items that seller not in blacklist
-func BlockedSellerFilter(data []mercarigo.MercariItem) []mercarigo.MercariItem {
+func BlockedSellerFilter(data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
 	if blockedSellers == nil {
 		panic(errors.New("BlockedSeller Must be a map, not nil"))
 	}
 
-	result := make([]mercarigo.MercariItem, 0, len(data))
+	result := make([]wrapperv1.MercariItem, 0, len(data))
 	for _, item := range data {
 		if _, ok := blockedSellers[item.Seller.Id]; !ok {
 			result = append(result, item)

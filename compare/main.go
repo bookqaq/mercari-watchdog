@@ -6,8 +6,8 @@ import (
 	"bookq.xyz/mercari-watchdog/models/analysisdata"
 	"bookq.xyz/mercari-watchdog/models/analysistask"
 	"bookq.xyz/mercari-watchdog/tools"
-	"github.com/bookqaq/goForMercari/mercarigo"
 	merwrapper "github.com/bookqaq/mer-wrapper"
+	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 )
 
 var Config = struct {
@@ -25,7 +25,7 @@ var Config = struct {
 }
 
 // Legacy compare method that use keyword-match threshold
-func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
+func Run2(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv1.MercariItem, error) {
 	uptime := recentData.Time
 
 	i := compNewTimestamp(data, uptime)
@@ -34,9 +34,9 @@ func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, ta
 	data = tools.PriceFilter(task.TargetPrice, data)
 	data = tools.BlockedSellerFilter(data)
 
-	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
+	fdata := make([]wrapperv1.MercariItem, 0, len(data)/4*3)
 	for _, item := range data {
-		desc, err := merwrapper.Client.Item(item.ProductId)
+		desc, err := merwrapper.Item(item.ProductId)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +48,7 @@ func Run2(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, ta
 }
 
 // CompareV3 compare method, math exactly in task.MustMatch
-func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]mercarigo.MercariItem, error) {
+func Run3(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv1.MercariItem, error) {
 	uptime := recentData.Time
 
 	i := compNewTimestamp(data, uptime)
@@ -57,7 +57,7 @@ func Run3(data []mercarigo.MercariItem, recentData analysisdata.AnalysisData, ta
 	data = tools.PriceFilter(task.TargetPrice, data)
 	data = tools.BlockedSellerFilter(data)
 
-	fdata := make([]mercarigo.MercariItem, 0, len(data)/4*3)
+	fdata := make([]wrapperv1.MercariItem, 0, len(data)/4*3)
 
 	for _, item := range data {
 		contain_flag := true

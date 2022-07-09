@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"bookq.xyz/mercari-watchdog/tools"
-	"github.com/bookqaq/goForMercari/mercarigo"
+	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,7 +16,7 @@ type AnalysisData struct {
 	TaskID   int32                   `bson:"taskID"` // a primary-key-alike value
 	Time     int64                   `bson:"time"`   // unix time
 	Length   int                     `bson:"length"` // length of data
-	Data     []mercarigo.MercariItem `bson:"data"`
+	Data     []wrapperv1.MercariItem `bson:"data"`
 }
 
 // privleged one display items in mulitple messages

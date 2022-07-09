@@ -114,7 +114,7 @@ func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 
 // Push channel with priority
 func msgPushService() {
-	tick := time.NewTicker(3 * time.Second)
+	tick := time.NewTicker(100 * time.Millisecond)
 	for {
 		select {
 		case push := <-OperationChan:
@@ -153,7 +153,8 @@ func msgPushService() {
 
 // the only function to send tools.PushMsg
 func pushCore(push tools.PushMsg) {
-	for _, item := range push.S {
-		Pichubot.SendGroupMsg(item, push.Dst)
-	}
+	fmt.Println(push)
+	//for _, item := range push.S {
+	//	Pichubot.SendGroupMsg(item, push.Dst)
+	//}
 }

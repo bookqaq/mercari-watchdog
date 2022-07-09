@@ -11,7 +11,7 @@ import (
 	"bookq.xyz/mercari-watchdog/models/analysisdata"
 	"bookq.xyz/mercari-watchdog/models/analysistask"
 	"bookq.xyz/mercari-watchdog/models/fetchdata"
-	"github.com/bookqaq/goForMercari/mercarigo"
+	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -112,7 +112,7 @@ func postTaskAddSubmit(c *gin.Context) {
 	}
 
 	// AnalysisData should be filled with some search result before insertion
-	firstData, err := mercarigo.Mercari_search(parsed.Data.KeywordsOrig, "created_time", "desc", "on_sale", 30, parsed.Data.MaxPage)
+	firstData, err := wrapperv1.Mercari_search(parsed.Data.KeywordsOrig, "created_time", "desc", "on_sale", 30, parsed.Data.MaxPage)
 	if err != nil {
 		c.JSON(http.StatusOK, genericPostReply{
 			Status:  "failed",

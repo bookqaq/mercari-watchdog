@@ -5,10 +5,10 @@ import (
 	"unicode/utf8"
 
 	"bookq.xyz/mercari-watchdog/tools"
-	"github.com/bookqaq/goForMercari/mercarigo"
+	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 )
 
-func compNewTimestamp(data []mercarigo.MercariItem, uptime int64) int {
+func compNewTimestamp(data []wrapperv1.MercariItem, uptime int64) int {
 	i := 0
 	for _, item := range data {
 		if item.Updated < uptime {
