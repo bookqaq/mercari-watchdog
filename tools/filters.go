@@ -4,12 +4,14 @@ import (
 	"errors"
 	"reflect"
 	"strings"
+	"sync"
 
 	"bookq.xyz/mercari-watchdog/models/blacklist"
 	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 )
 
 var blockedSellers map[int64]blacklist.BlockedSeller
+var lock *sync.Mutex
 
 //
 func RefreshBlockedSellers() {
@@ -22,7 +24,9 @@ func RefreshBlockedSellers() {
 	for _, seller := range res {
 		blockMap_tmp[seller.UserID] = seller
 	}
+	lock.Lock()
 	blockedSellers = blockMap_tmp
+	lock.Unlock()
 }
 
 // filters
