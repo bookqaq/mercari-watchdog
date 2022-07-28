@@ -11,7 +11,7 @@ import (
 )
 
 var blockedSellers map[int64]blacklist.BlockedSeller
-var lock *sync.Mutex
+var lock sync.Mutex
 
 //
 func RefreshBlockedSellers() {
