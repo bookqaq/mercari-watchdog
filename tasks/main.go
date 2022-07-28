@@ -26,9 +26,9 @@ const (
 var taskChans []chan analysistask.AnalysisTask
 
 func Boot() {
+	tools.RefreshBlockedSellers()
 	analysisdata.RenewAll()
 	go analysistask.AddTaskBuffer()
-	tools.RefreshBlockedSellers()
 
 	// create tickers for time-based tasks
 	ticker_10m := time.NewTicker(60 * time.Second)
