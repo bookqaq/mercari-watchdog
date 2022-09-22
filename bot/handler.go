@@ -91,6 +91,22 @@ func handlerGroupRequest(r Pichubot.GroupRequest) {
 	Pichubot.SetGroupInviteRequest(r.Flag, true, "")
 }
 
+func handlerGroupLeave(r Pichubot.GroupDecrease) {
+	if r.SubType != "kick_me" {
+		return
+	}
+
+	if err := analysistask.DeleteByGroup(r.GroupId); err != nil {
+		Pichubot.Logger.Alertf("Delete fail when removing kicked task, %s", err)
+	}
+
+	if err := analysisdata.DeleteByGroup(r.GroupId); err != nil {
+		Pichubot.Logger.Alertf("Delete fail when removing kicked task, %s", err)
+	}
+
+	Pichubot.Logger.Infof("Kicked task deleted, %d", r.GroupId)
+}
+
 // Push AnalysisData to msg queue.
 func MercariPushMsg(data analysisdata.AnalysisData, owner int64, group int64) {
 	if data.Length <= 0 {

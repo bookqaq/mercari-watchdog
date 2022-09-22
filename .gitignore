@@ -1,5 +1,5 @@
 # Binaries for programs and plugins
-./mercari-watchdog
+mercari-watchdog
 *.exe
 *.exe~
 *.dll

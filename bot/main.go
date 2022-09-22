@@ -20,6 +20,7 @@ func Boot() {
 	// add listeners
 	Pichubot.Listeners.OnGroupMsg = append(Pichubot.Listeners.OnGroupMsg, handlerHelp, handlerGroupMsg)
 	Pichubot.Listeners.OnGroupRequest = append(Pichubot.Listeners.OnGroupRequest, handlerGroupRequest)
+	Pichubot.Listeners.OnGroupDecrease = append(Pichubot.Listeners.OnGroupDecrease, handlerGroupLeave)
 
 	// config connection
 	bot := Pichubot.NewBot()

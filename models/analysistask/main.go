@@ -66,6 +66,12 @@ func Delete(taskID int32, qq int64) error {
 	return nil
 }
 
+func DeleteByGroup(group int64) error {
+	coll := database.DB.Collection("AnalysisTask")
+	_, err := coll.DeleteMany(context.TODO(), bson.D{primitive.E{Key: "group", Value: group}})
+	return err
+}
+
 // Cache and insert.
 
 // implement debounce when inserting tasks
@@ -93,4 +99,5 @@ func addTasks() {
 	if err != nil {
 		fmt.Printf("err inserting tasks from buffer, %s\n", err)
 	}
+
 }

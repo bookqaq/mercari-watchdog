@@ -51,6 +51,12 @@ func Delete(taskID int32) error {
 	return nil
 }
 
+func DeleteByGroup(group int64) error {
+	coll := database.DB.Collection("AnalysisData")
+	_, err := coll.DeleteMany(context.TODO(), bson.D{primitive.E{Key: "group", Value: group}})
+	return err
+}
+
 // Refresh data.Time to time.Now().Unix() for newest result
 func RenewAll() {
 	coll := database.DB.Collection("AnalysisData")
