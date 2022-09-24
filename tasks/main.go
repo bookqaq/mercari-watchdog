@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	TaskRoutines   = 5
+	TaskRoutines   = 6
 	TaskTickerTime = 5 * time.Second
 )
 
@@ -35,7 +35,7 @@ func Boot() {
 	ticker_5m := time.NewTicker(60 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
 
-	// manage all workers in an array
+	// manage all workers in a slice
 	taskChans = make([]chan analysistask.AnalysisTask, TaskRoutines)
 	for i := 0; i < TaskRoutines; i++ {
 		taskChans[i] = make(chan analysistask.AnalysisTask, 5)
@@ -68,7 +68,6 @@ func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
 	}
 }
 
-//
 func runWorkflow(interval int, t time.Time) {
 	// for dev locally
 	//proxyUrl := "http://127.0.0.1:8889"

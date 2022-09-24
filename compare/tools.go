@@ -22,7 +22,7 @@ func compNewTimestamp(data []wrapperv1.MercariItem, uptime int64) int {
 // service: format item description and judge
 func compDescriptionFilter(keywords []string, title string, description string) bool {
 	// loads of runes used by yhm to split lines/words and split those into array
-	descrpition_arr := strings.Split(StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
+	descrpition_arr := strings.Split(tools.StringMultipleReplacer(description, []rune{'\n', '\u3000', '\xa0', '\\', '、', '/'}, ' '), " ")
 	del_count := tools.DeleteInvalidItem(descrpition_arr, "")
 	descrpition_arr = descrpition_arr[:len(descrpition_arr)-del_count]
 
@@ -64,21 +64,6 @@ func compDescriptionFilter(keywords []string, title string, description string) 
 
 	// simplify judges about return value (forced by gopls)
 	return float32(contain_count)/float32(len(keywords)) >= Config.V2KeywordMatchMin
-}
-
-// Replace rune to new in s if rune in old
-// TODO: Change old to map[rune]struct{} for a faster find speed
-func StringMultipleReplacer(s string, old []rune, new rune) string {
-	r := []rune(s)
-	for i, v := range r {
-		for _, item := range old {
-			if v == item {
-				r[i] = ' '
-				break
-			}
-		}
-	}
-	return string(r)
 }
 
 // move words that after kensaku words forward, need to slice manually

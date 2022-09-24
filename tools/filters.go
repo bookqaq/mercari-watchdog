@@ -2,7 +2,6 @@ package tools
 
 import (
 	"errors"
-	"reflect"
 	"strings"
 
 	"bookq.xyz/mercari-watchdog/models/blacklist"
@@ -11,7 +10,6 @@ import (
 
 var blockedSellers map[int64]struct{}
 
-//
 func RefreshBlockedSellers() {
 	res, err := blacklist.BlockedSellerGetAll()
 	if err != nil {
@@ -28,16 +26,27 @@ func RefreshBlockedSellers() {
 // filters
 // Return items that match task.Keywords
 func KeywordFilter(keywords []string, data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
-	for _, keyword := range keywords {
-		tmp := make([]wrapperv1.MercariItem, 0, len(data))
-		for _, item := range data {
-			if strings.Contains(item.ProductName, keyword) {
-				tmp = append(tmp, item)
+	ans, lenKeyword := make([]wrapperv1.MercariItem, 0, len(data)), len(keywords)
+	for _, d := range data {
+		matched := 0
+		title_sp := strings.Split(StringMultipleReplacer(d.ProductName, []rune{'\u3000', '\xa0', '、', '/'}, ' '), " ")
+		for _, keyword := range keywords {
+			findMatch := false
+			for _, titleWord := range title_sp {
+				if keywordPercentage(titleWord, keyword) >= thresholdSingleKeyword {
+					findMatch = true
+				}
 			}
-			data = tmp
+
+			if findMatch {
+				matched++
+			}
+		}
+		if matched >= lenKeyword {
+			ans = append(ans, d)
 		}
 	}
-	return data
+	return ans
 }
 
 // Return items that price in task.TargetPrice
@@ -70,16 +79,7 @@ func BlockedSellerFilter(data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
 	return result
 }
 
-// Delete item in ordered array src that filter when reflect.DeepEqual(item, value) != true, return lenght deleted
-func DeleteInvalidItem[T any](src []T, value T) int {
-	deleted, formerpt, length := 0, 0, len(src)
-	for i := 0; i < length; i++ {
-		if reflect.DeepEqual(src[i], value) {
-			deleted++
-		} else {
-			src[formerpt] = src[i]
-			formerpt++
-		}
-	}
-	return deleted
+// filter tools
+func keywordPercentage(s, compareTo string) float64 {
+	return float64(LongestCommon([]rune(s), []rune(compareTo))) / float64(len([]rune(compareTo)))
 }

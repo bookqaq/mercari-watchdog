@@ -1,8 +1,6 @@
 package compare
 
 import (
-	"strings"
-
 	"bookq.xyz/mercari-watchdog/models/analysisdata"
 	"bookq.xyz/mercari-watchdog/models/analysistask"
 	"bookq.xyz/mercari-watchdog/tools"
@@ -56,20 +54,7 @@ func Run3(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, ta
 	data = data[:i]
 	data = tools.PriceFilter(task.TargetPrice, data)
 	data = tools.BlockedSellerFilter(data)
+	data = tools.KeywordFilter(task.MustMatch, data)
 
-	fdata := make([]wrapperv1.MercariItem, 0, len(data)/4*3)
-
-	for _, item := range data {
-		contain_flag := true
-		for _, kw := range task.MustMatch {
-			if !strings.Contains(item.ProductName, kw) {
-				contain_flag = false
-				break
-			}
-		}
-		if contain_flag {
-			fdata = append(fdata, item)
-		}
-	}
-	return fdata, nil
+	return data, nil
 }
