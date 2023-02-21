@@ -3,12 +3,14 @@ package tools
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	"bookq.xyz/mercari-watchdog/models/blacklist"
 	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
 )
 
-var blockedSellers map[int64]struct{}
+var blockedSellers map[int64]blacklist.BlockedSeller
+var lock sync.Mutex
 
 func RefreshBlockedSellers() {
 	res, err := blacklist.BlockedSellerGetAll()
@@ -16,11 +18,13 @@ func RefreshBlockedSellers() {
 		panic(err)
 	}
 
-	blockMap_tmp := make(map[int64]struct{}, len(res))
+	blockMap_tmp := make(map[int64]blacklist.BlockedSeller, len(res))
 	for _, seller := range res {
-		blockMap_tmp[seller.UserID] = struct{}{}
+		blockMap_tmp[seller.UserID] = seller
 	}
+	lock.Lock()
 	blockedSellers = blockMap_tmp
+	lock.Unlock()
 }
 
 // filters
@@ -64,6 +68,21 @@ func PriceFilter(price [2]int, data []wrapperv1.MercariItem) []wrapperv1.Mercari
 	return result
 }
 
+func blockedSellersIfInclude(reason string) bool {
+	var res bool
+	switch reason {
+	case "虚假标价":
+		res = true
+	case "圈外检索词":
+		res = false
+	case "出售假谷":
+		res = false
+	default:
+		res = true
+	}
+	return res
+}
+
 // return items that seller not in blacklist
 func BlockedSellerFilter(data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
 	if blockedSellers == nil {
@@ -72,7 +91,7 @@ func BlockedSellerFilter(data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
 
 	result := make([]wrapperv1.MercariItem, 0, len(data))
 	for _, item := range data {
-		if _, ok := blockedSellers[item.Seller.Id]; !ok {
+		if data, ok := blockedSellers[item.Seller.Id]; !ok || blockedSellersIfInclude(data.Reason) {
 			result = append(result, item)
 		}
 	}

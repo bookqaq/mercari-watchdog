@@ -26,6 +26,7 @@ const (
 var taskChans []chan analysistask.AnalysisTask
 
 func Boot() {
+	tools.RefreshBlockedSellers()
 	analysisdata.RenewAll()
 	go analysistask.AddTaskBuffer()
 
@@ -44,7 +45,6 @@ func Boot() {
 
 	// Run tasks when Ticker tick.
 	for {
-		tools.RefreshBlockedSellers()
 		select {
 		case t := <-ticker_1h.C:
 			go runWorkflow(3600, t)
@@ -54,6 +54,7 @@ func Boot() {
 			go runWorkflow(300, t)
 		case <-ticker_clearExpiredFetch.C:
 			go fetchdata.ClearExpired()
+			go tools.RefreshBlockedSellers()
 		}
 	}
 }
@@ -92,7 +93,7 @@ func runWorkflow(interval int, t time.Time) {
 
 	// TODO: convert taskChans to link list with loop
 	for i, taskItem := range taskResults {
-		fmt.Println("Started: ", i%TaskRoutines, taskItem.TaskID, taskItem.Keywords)
+		//fmt.Println("Started: ", i%TaskRoutines, taskItem.TaskID, taskItem.Keywords)
 		taskChans[i%TaskRoutines] <- taskItem
 	}
 }
@@ -138,5 +139,5 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 		fmt.Printf("failed to update AnalysisData, taskID %v, time %v, %s", recentItems.TaskID, t.Unix(), err)
 		return
 	}
-	fmt.Println("Pushed: ", task.TaskID, task.Keywords)
+	//fmt.Println("Pushed: ", task.TaskID, task.Keywords)
 }
