@@ -19,8 +19,7 @@ import (
 )
 
 const (
-	TaskRoutines   = 6
-	TaskTickerTime = 5 * time.Second
+	TaskRoutines = 10
 )
 
 var taskChans []chan analysistask.AnalysisTask
@@ -31,8 +30,8 @@ func Boot() {
 	go analysistask.AddTaskBuffer()
 
 	// create tickers for time-based tasks
-	ticker_10m := time.NewTicker(60 * time.Second)
 	ticker_1h := time.NewTicker(1800 * time.Second)
+	ticker_10m := time.NewTicker(60 * time.Second)
 	ticker_5m := time.NewTicker(60 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
 
@@ -59,14 +58,17 @@ func Boot() {
 	}
 }
 
-// tasks worker, excute tasks processing every tasks.TaskTickTime
+// tasks worker
 func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
-	//ticker := time.NewTicker(TaskTickerTime)
 	for {
 		task := <-taskInput
+		taskModifier(&task)
 		runTask(time.Now(), task)
-		//<-ticker.C
 	}
+}
+
+func taskModifier(task *analysistask.AnalysisTask) {
+	task.MaxPage = 1
 }
 
 func runWorkflow(interval int, t time.Time) {
