@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/bookqaq/mer-wrapper/common"
-	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
+	wrapperv2 "github.com/bookqaq/mer-wrapper/v2"
 )
 
 const (
@@ -34,6 +34,7 @@ func Boot() {
 	ticker_10m := time.NewTicker(60 * time.Second)
 	ticker_5m := time.NewTicker(60 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
+	ticker_cleanImages := time.NewTicker(7200 * time.Second)
 
 	// manage all workers in a slice
 	taskChans = make([]chan analysistask.AnalysisTask, TaskRoutines)
@@ -54,6 +55,8 @@ func Boot() {
 		case <-ticker_clearExpiredFetch.C:
 			go fetchdata.ClearExpired()
 			go tools.RefreshBlockedSellers()
+		case <-ticker_cleanImages.C:
+			go cleanImages()
 		}
 	}
 }
@@ -103,7 +106,10 @@ func runWorkflow(interval int, t time.Time) {
 func runTask(t time.Time, task analysistask.AnalysisTask) {
 
 	// fetch items data from mercari
-	data, err := wrapperv1.Mercari_search(tools.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
+	data, err := wrapperv2.Search(wrapperv2.SearchData{
+		Keyword: tools.ConcatKeyword(task.Keywords),
+		Limit:   30,
+	})
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
@@ -115,7 +121,7 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
-	var result []wrapperv1.MercariItem
+	var result []wrapperv2.MercariV2Item
 
 	// mainly v3, implement compatability about v2
 	if len(task.MustMatch) <= 0 {

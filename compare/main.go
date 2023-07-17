@@ -4,8 +4,7 @@ import (
 	"bookq.xyz/mercari-watchdog/models/analysisdata"
 	"bookq.xyz/mercari-watchdog/models/analysistask"
 	"bookq.xyz/mercari-watchdog/tools"
-	merwrapper "github.com/bookqaq/mer-wrapper"
-	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
+	wrapperv2 "github.com/bookqaq/mer-wrapper/v2"
 )
 
 var Config = struct {
@@ -23,7 +22,7 @@ var Config = struct {
 }
 
 // Legacy compare method that use keyword-match threshold
-func Run2(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv1.MercariItem, error) {
+func Run2(data []wrapperv2.MercariV2Item, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv2.MercariV2Item, error) {
 	uptime := recentData.Time
 
 	i := compNewTimestamp(data, uptime)
@@ -32,9 +31,9 @@ func Run2(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, ta
 	data = tools.PriceFilter(task.TargetPrice, data)
 	data = tools.BlockedSellerFilter(data)
 
-	fdata := make([]wrapperv1.MercariItem, 0, len(data)/4*3)
+	fdata := make([]wrapperv2.MercariV2Item, 0, len(data)/4*3)
 	for _, item := range data {
-		desc, err := merwrapper.Item(item.ProductId)
+		desc, err := wrapperv2.Item(item.ProductId)
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +45,7 @@ func Run2(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, ta
 }
 
 // CompareV3 compare method, math exactly in task.MustMatch
-func Run3(data []wrapperv1.MercariItem, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv1.MercariItem, error) {
+func Run3(data []wrapperv2.MercariV2Item, recentData analysisdata.AnalysisData, task analysistask.AnalysisTask) ([]wrapperv2.MercariV2Item, error) {
 	uptime := recentData.Time
 
 	i := compNewTimestamp(data, uptime)

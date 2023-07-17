@@ -2,11 +2,12 @@ package tools
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"sync"
 
 	"bookq.xyz/mercari-watchdog/models/blacklist"
-	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
+	wrapperv2 "github.com/bookqaq/mer-wrapper/v2"
 )
 
 var blockedSellers map[int64]blacklist.BlockedSeller
@@ -29,8 +30,8 @@ func RefreshBlockedSellers() {
 
 // filters
 // Return items that match task.Keywords
-func KeywordFilter(keywords []string, data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
-	ans, lenKeyword := make([]wrapperv1.MercariItem, 0, len(data)), len(keywords)
+func KeywordFilter(keywords []string, data []wrapperv2.MercariV2Item) []wrapperv2.MercariV2Item {
+	ans, lenKeyword := make([]wrapperv2.MercariV2Item, 0, len(data)), len(keywords)
 	for _, d := range data {
 		matched := 0
 		title_sp := strings.Split(StringMultipleReplacer(d.ProductName, []rune{'\u3000', '\xa0', '、', '/'}, ' '), " ")
@@ -54,11 +55,13 @@ func KeywordFilter(keywords []string, data []wrapperv1.MercariItem) []wrapperv1.
 }
 
 // Return items that price in task.TargetPrice
-func PriceFilter(price [2]int, data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
-	result := make([]wrapperv1.MercariItem, 0, len(data))
+func PriceFilter(price [2]int, data []wrapperv2.MercariV2Item) []wrapperv2.MercariV2Item {
+	result := make([]wrapperv2.MercariV2Item, 0, len(data))
 	if price[0] >= 0 && price[1] >= price[0] {
 		for _, item := range data {
-			if item.Price >= price[0] && item.Price <= price[1] {
+			itemPrice, _ := strconv.ParseInt(item.Price, 10, 64)
+			priceInt := int(itemPrice)
+			if priceInt >= price[0] && priceInt <= price[1] {
 				result = append(result, item)
 			}
 		}
@@ -84,14 +87,15 @@ func blockedSellersIfInclude(reason string) bool {
 }
 
 // return items that seller not in blacklist
-func BlockedSellerFilter(data []wrapperv1.MercariItem) []wrapperv1.MercariItem {
+func BlockedSellerFilter(data []wrapperv2.MercariV2Item) []wrapperv2.MercariV2Item {
 	if blockedSellers == nil {
 		panic(errors.New("BlockedSeller Must be a map, not nil"))
 	}
 
-	result := make([]wrapperv1.MercariItem, 0, len(data))
+	result := make([]wrapperv2.MercariV2Item, 0, len(data))
 	for _, item := range data {
-		if data, ok := blockedSellers[item.Seller.Id]; !ok || blockedSellersIfInclude(data.Reason) {
+		seller, _ := strconv.ParseInt(item.Seller, 10, 64)
+		if data, ok := blockedSellers[seller]; !ok || blockedSellersIfInclude(data.Reason) {
 			result = append(result, item)
 		}
 	}
