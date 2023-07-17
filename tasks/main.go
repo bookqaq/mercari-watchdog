@@ -15,12 +15,11 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/bookqaq/mer-wrapper/common"
-	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
+	wrapperv2 "github.com/bookqaq/mer-wrapper/v2"
 )
 
 const (
-	TaskRoutines   = 6
-	TaskTickerTime = 5 * time.Second
+	TaskRoutines = 10
 )
 
 var taskChans []chan analysistask.AnalysisTask
@@ -31,10 +30,11 @@ func Boot() {
 	go analysistask.AddTaskBuffer()
 
 	// create tickers for time-based tasks
-	ticker_10m := time.NewTicker(60 * time.Second)
 	ticker_1h := time.NewTicker(1800 * time.Second)
+	ticker_10m := time.NewTicker(60 * time.Second)
 	ticker_5m := time.NewTicker(60 * time.Second)
 	ticker_clearExpiredFetch := time.NewTicker(150 * time.Second)
+	ticker_cleanImages := time.NewTicker(7200 * time.Second)
 
 	// manage all workers in a slice
 	taskChans = make([]chan analysistask.AnalysisTask, TaskRoutines)
@@ -55,18 +55,23 @@ func Boot() {
 		case <-ticker_clearExpiredFetch.C:
 			go fetchdata.ClearExpired()
 			go tools.RefreshBlockedSellers()
+		case <-ticker_cleanImages.C:
+			go cleanImages()
 		}
 	}
 }
 
-// tasks worker, excute tasks processing every tasks.TaskTickTime
+// tasks worker
 func taskChanListener(taskInput <-chan analysistask.AnalysisTask) {
-	//ticker := time.NewTicker(TaskTickerTime)
 	for {
 		task := <-taskInput
+		taskModifier(&task)
 		runTask(time.Now(), task)
-		//<-ticker.C
 	}
+}
+
+func taskModifier(task *analysistask.AnalysisTask) {
+	task.MaxPage = 1
 }
 
 func runWorkflow(interval int, t time.Time) {
@@ -101,7 +106,10 @@ func runWorkflow(interval int, t time.Time) {
 func runTask(t time.Time, task analysistask.AnalysisTask) {
 
 	// fetch items data from mercari
-	data, err := wrapperv1.Mercari_search(tools.ConcatKeyword(task.Keywords), task.Sort, task.Order, "on_sale", 30, task.MaxPage)
+	data, err := wrapperv2.Search(wrapperv2.SearchData{
+		Keyword: tools.ConcatKeyword(task.Keywords),
+		Limit:   30,
+	})
 	if err != nil {
 		fmt.Printf("failed to search, taskID %v, time %v\n", task.TaskID, t.Unix())
 		return
@@ -113,7 +121,7 @@ func runTask(t time.Time, task analysistask.AnalysisTask) {
 		fmt.Printf("failed to get last search data, taskID %v, time %v, %s\n", task.TaskID, t.Unix(), err)
 		return
 	}
-	var result []wrapperv1.MercariItem
+	var result []wrapperv2.MercariV2Item
 
 	// mainly v3, implement compatability about v2
 	if len(task.MustMatch) <= 0 {

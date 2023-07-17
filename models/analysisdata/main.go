@@ -9,7 +9,10 @@ import (
 	"bookq.xyz/mercari-watchdog/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var optionsDoUpsert = options.FindOneAndReplace().SetUpsert(true)
 
 func GetOne(taskid int32) (AnalysisData, error) {
 	coll := database.DB.Collection("AnalysisData")
@@ -23,7 +26,7 @@ func GetOne(taskid int32) (AnalysisData, error) {
 
 func Update(data AnalysisData) error {
 	coll := database.DB.Collection("AnalysisData")
-	res := coll.FindOneAndReplace(context.TODO(), bson.D{primitive.E{Key: "_id", Value: data.ID}}, data)
+	res := coll.FindOneAndReplace(context.TODO(), bson.D{primitive.E{Key: "_id", Value: data.ID}}, data, optionsDoUpsert)
 	if err := res.Err(); err != nil {
 		return err
 	}

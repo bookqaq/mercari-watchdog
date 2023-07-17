@@ -1,17 +1,19 @@
 package compare
 
 import (
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
 	"bookq.xyz/mercari-watchdog/tools"
-	wrapperv1 "github.com/bookqaq/mer-wrapper/v1"
+	wrapperv2 "github.com/bookqaq/mer-wrapper/v2"
 )
 
-func compNewTimestamp(data []wrapperv1.MercariItem, uptime int64) int {
+func compNewTimestamp(data []wrapperv2.MercariV2Item, uptime int64) int {
 	i := 0
 	for _, item := range data {
-		if item.Updated < uptime {
+		updated, _ := strconv.ParseInt(item.Updated, 10, 64)
+		if updated < uptime {
 			break
 		}
 		i++
