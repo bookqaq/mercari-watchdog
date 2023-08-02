@@ -11,7 +11,7 @@ var Push3to4Chan chan tools.PushMsg
 var Push5upChan chan tools.PushMsg
 
 func Boot() {
-	// init message chanwith Priority
+	// init message chan with Priority
 	OperationChan = make(chan tools.PushMsg, 10)
 	Push1to2Chan = make(chan tools.PushMsg, 10)
 	Push3to4Chan = make(chan tools.PushMsg, 10)

@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,22 +10,18 @@ import (
 
 func cleanImages() {
 	now := time.Now()
-	files, err := filepath.Glob("files/")
-	if err != nil {
-		log.Printf("遍历图片文件时发生错误 %v", err)
-	}
-	for _, file := range files {
-		// 获取文件的时间
-		createdAt, err := os.Stat(file)
+	err := filepath.Walk("files/", func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			fmt.Println(err)
-			continue
+			return err
 		}
-
 		// 如果文件的上传修改时间超过1小时，则删除该文件
-		if createdAt.ModTime().Before(now.Add(-time.Hour)) {
-			fmt.Println("Deleting file:", file)
-			os.Remove(file)
+		if info.ModTime().Before(now.Add(-time.Hour)) {
+			log.Println("Deleting file:", path)
+			os.Remove(path)
 		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("error when deleting thumbnails: %v", err)
 	}
 }
